@@ -125,3 +125,58 @@ export const getWeeklyStats = (
   
   return stats;
 };
+
+export const getTasksByCategory = (tasks: Task[]): {name: string; value: number}[] => {
+  const categoryMap = new Map<string, number>();
+  
+  tasks.forEach(task => {
+    const category = task.category || 'Uncategorized';
+    categoryMap.set(category, (categoryMap.get(category) || 0) + 1);
+  });
+  
+  return Array.from(categoryMap.entries()).map(([name, value]) => ({
+    name,
+    value
+  }));
+};
+
+export const getProductivityTrends = (
+  tasks: Task[], 
+  timeBlocks: TimeBlock[], 
+  days = 14
+): {date: string; completionRate: number; timeSpent: number}[] => {
+  const today = new Date();
+  const trends = [];
+  
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(today.getDate() - i);
+    
+    const dayBlocks = timeBlocks.filter(block => {
+      const blockDate = new Date(block.start);
+      return blockDate.getDate() === date.getDate() && 
+             blockDate.getMonth() === date.getMonth() && 
+             blockDate.getFullYear() === date.getFullYear();
+    });
+    
+    const completed = dayBlocks.filter(block => block.completed).length;
+    const scheduled = dayBlocks.length;
+    const completionRate = scheduled > 0 ? (completed / scheduled) * 100 : 0;
+    
+    const timeSpent = dayBlocks.reduce((total, block) => {
+      if (block.completed) {
+        const duration = (block.end.getTime() - block.start.getTime()) / 60000;
+        return total + duration;
+      }
+      return total;
+    }, 0) / 60; // Convert to hours
+    
+    trends.push({
+      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      completionRate: Math.round(completionRate),
+      timeSpent: Math.round(timeSpent * 10) / 10 // Round to 1 decimal
+    });
+  }
+  
+  return trends;
+};

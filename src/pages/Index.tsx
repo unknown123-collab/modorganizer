@@ -4,6 +4,7 @@ import { TaskProvider } from '@/contexts/TaskContext';
 import Dashboard from '@/components/Dashboard';
 import Sidebar from '@/components/Sidebar';
 import TaskPanel from '@/components/TaskPanel';
+import Analytics from '@/components/Analytics';
 import MobileNav from '@/components/MobileNav';
 
 const Index = () => {
@@ -31,9 +32,9 @@ const Index = () => {
           <div className="p-4">
             {activeView === 'dashboard' && <Dashboard />}
             {activeView === 'tasks' && <TaskPanel />}
-            {/* We'll add Calendar and Analytics components later */}
+            {activeView === 'analytics' && <Analytics />}
+            {/* We'll add Calendar component later */}
             {activeView === 'calendar' && <div className="text-2xl">Calendar View Coming Soon</div>}
-            {activeView === 'analytics' && <div className="text-2xl">Analytics View Coming Soon</div>}
           </div>
         </div>
       </div>
