@@ -23,6 +23,7 @@ interface TaskContextType {
   addTaskToProject: (taskId: string, projectId: string) => void;
   removeTaskFromProject: (taskId: string, projectId: string) => void;
   createTaskFromText: (text: string) => Task | null;
+  extractTasksFromText: (text: string) => ReturnType<typeof extractTasksFromText>;
   generateSchedule: () => void;
   updateSettings: (newSettings: Partial<UserSettings>) => void;
   getPriorityTasks: (limit?: number) => Task[];
@@ -212,6 +213,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       deadline: extracted.deadline,
       priority: extracted.priority as Task['priority'],
       timeEstimate: extracted.timeEstimate,
+      category: extracted.category,
+      tags: extracted.tags,
     });
     
     return newTask;
@@ -250,6 +253,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     addTaskToProject,
     removeTaskFromProject,
     createTaskFromText,
+    extractTasksFromText,
     generateSchedule,
     updateSettings,
     getPriorityTasks,

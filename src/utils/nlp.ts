@@ -4,6 +4,8 @@ export const extractTasksFromText = (text: string): {
   deadline?: Date; 
   priority?: string;
   timeEstimate?: number;
+  category?: string;
+  tags?: string[];
 } | null => {
   if (!text || text.trim() === '') return null;
   
@@ -11,6 +13,8 @@ export const extractTasksFromText = (text: string): {
   let deadline: Date | undefined = undefined;
   let priority: string | undefined = undefined;
   let timeEstimate: number | undefined = undefined;
+  let category: string | undefined = undefined;
+  let tags: string[] | undefined = undefined;
   
   // Extract deadline using regex
   const dateRegex = /by\s(tomorrow|today|monday|tuesday|wednesday|thursday|friday|saturday|sunday|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|january|february|march|april|may|june|july|august|september|october|november|december)(\s\d{1,2}(st|nd|rd|th)?)?(\s\d{4})?/i;
@@ -58,12 +62,32 @@ export const extractTasksFromText = (text: string): {
     
     title = title.replace(priorityMatch[0], '').trim();
   }
+
+  // Extract category
+  const categoryRegex = /#(\w+)/i;
+  const categoryMatch = text.match(categoryRegex);
+
+  if (categoryMatch) {
+    category = categoryMatch[1];
+    title = title.replace(categoryMatch[0], '').trim();
+  }
+
+  // Extract tags
+  const tagMatches = text.match(/@(\w+)/g);
+  if (tagMatches) {
+    tags = tagMatches.map(tag => tag.substring(1));
+    tagMatches.forEach(tag => {
+      title = title.replace(tag, '').trim();
+    });
+  }
   
   return {
     title,
     deadline,
     priority,
     timeEstimate,
+    category,
+    tags,
   };
 };
 
