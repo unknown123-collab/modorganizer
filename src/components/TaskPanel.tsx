@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useTaskContext } from '@/contexts/TaskContext';
+import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import TaskInput from './TaskInput';
 import { CheckCheck, MoreHorizontal, Filter } from 'lucide-react';
 import { 
@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const TaskPanel = () => {
-  const { tasks, completeTask, deleteTask } = useTaskContext();
+  const { tasks, updateTask, deleteTask } = useSupabaseTasks();
   const [filter, setFilter] = useState<string>('all');
   
   const filteredTasks = tasks.filter(task => {
@@ -40,6 +40,13 @@ const TaskPanel = () => {
       case 'urgent-notImportant': return 'bg-orange-500';
       case 'notUrgent-important': return 'bg-yellow-500';
       default: return 'bg-blue-500';
+    }
+  };
+
+  const completeTask = async (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      await updateTask(taskId, { completed: !task.completed });
     }
   };
   
@@ -105,13 +112,13 @@ const TaskPanel = () => {
                       
                       {task.deadline && (
                         <div className="text-xs text-muted-foreground">
-                          Due: {task.deadline.toLocaleDateString()}
+                          Due: {new Date(task.deadline).toLocaleDateString()}
                         </div>
                       )}
                       
-                      {task.timeEstimate && (
+                      {task.time_estimate && (
                         <div className="text-xs text-muted-foreground">
-                          Est: {task.timeEstimate} min
+                          Est: {task.time_estimate} min
                         </div>
                       )}
                     </div>
