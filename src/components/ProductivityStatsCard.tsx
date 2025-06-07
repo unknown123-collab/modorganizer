@@ -1,9 +1,22 @@
 
 import React from 'react';
-import { useTaskContext } from '@/contexts/TaskContext';
+import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 
 const ProductivityStatsCard = () => {
-  const { productivityStats } = useTaskContext();
+  const { tasks } = useSupabaseTasks();
+  
+  // Calculate basic productivity stats from Supabase tasks
+  const completedTasks = tasks.filter(task => task.completed).length;
+  const totalTasks = tasks.length;
+  const focusScore = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  
+  // Calculate estimated time spent (sum of completed tasks' time estimates)
+  const timeSpent = tasks
+    .filter(task => task.completed && task.time_estimate)
+    .reduce((total, task) => total + (task.time_estimate || 0), 0);
+  
+  // Simple streak calculation (for now, just show 1 if any tasks completed, 0 otherwise)
+  const streak = completedTasks > 0 ? 1 : 0;
   
   const formatTime = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
@@ -23,12 +36,12 @@ const ProductivityStatsCard = () => {
         <div>
           <div className="flex justify-between items-center mb-1">
             <span className="text-sm">Focus Score</span>
-            <span className="text-sm font-medium">{Math.round(productivityStats.focusScore)}%</span>
+            <span className="text-sm font-medium">{focusScore}%</span>
           </div>
           <div className="w-full h-2 bg-muted rounded-full">
             <div 
               className="h-2 bg-primary rounded-full" 
-              style={{ width: `${productivityStats.focusScore}%` }}
+              style={{ width: `${focusScore}%` }}
             />
           </div>
         </div>
@@ -36,20 +49,20 @@ const ProductivityStatsCard = () => {
         {/* Tasks Completed */}
         <div className="flex justify-between items-center">
           <span className="text-sm">Tasks Completed</span>
-          <span className="text-sm font-medium">{productivityStats.tasksCompleted}/{productivityStats.totalTasks}</span>
+          <span className="text-sm font-medium">{completedTasks}/{totalTasks}</span>
         </div>
         
         {/* Time Spent */}
         <div className="flex justify-between items-center">
           <span className="text-sm">Time Spent</span>
-          <span className="text-sm font-medium">{formatTime(productivityStats.timeSpent)}</span>
+          <span className="text-sm font-medium">{formatTime(timeSpent)}</span>
         </div>
         
         {/* Daily Streak */}
         <div className="flex justify-between items-center">
           <span className="text-sm">Daily Streak</span>
           <span className="text-sm font-medium">
-            {productivityStats.streak} {productivityStats.streak === 1 ? 'day' : 'days'}
+            {streak} {streak === 1 ? 'day' : 'days'}
           </span>
         </div>
       </div>
