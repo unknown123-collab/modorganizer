@@ -1,10 +1,40 @@
 
 import React from 'react';
-import { useTaskContext } from '@/contexts/TaskContext';
+import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import { CheckCircle } from 'lucide-react';
 
 const PriorityTasksCard = () => {
-  const { getPriorityTasks, completeTask } = useTaskContext();
+  const { tasks, updateTask } = useSupabaseTasks();
+  
+  // Get priority tasks (limit to 5, prioritize by urgency and importance)
+  const getPriorityTasks = (limit = 5) => {
+    const priorityOrder = {
+      'urgent-important': 1,
+      'urgent-notImportant': 2, 
+      'notUrgent-important': 3,
+      'notUrgent-notImportant': 4
+    };
+    
+    return tasks
+      .filter(task => !task.completed)
+      .sort((a, b) => {
+        const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder] || 4;
+        const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder] || 4;
+        
+        if (aPriority !== bPriority) {
+          return aPriority - bPriority;
+        }
+        
+        // If same priority, sort by deadline
+        if (a.deadline && b.deadline) {
+          return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+        }
+        
+        return 0;
+      })
+      .slice(0, limit);
+  };
+  
   const priorityTasks = getPriorityTasks(5);
   
   const getPriorityColor = (priority: string) => {
@@ -14,6 +44,10 @@ const PriorityTasksCard = () => {
       case 'notUrgent-important': return 'bg-yellow-500';
       default: return 'bg-blue-500';
     }
+  };
+  
+  const completeTask = async (taskId: string) => {
+    await updateTask(taskId, { completed: true });
   };
   
   return (
@@ -30,7 +64,7 @@ const PriorityTasksCard = () => {
                   <div className="font-medium">{task.title}</div>
                   {task.deadline && (
                     <div className="text-xs text-muted-foreground">
-                      Due: {task.deadline.toLocaleDateString()}
+                      Due: {new Date(task.deadline).toLocaleDateString()}
                     </div>
                   )}
                 </div>
