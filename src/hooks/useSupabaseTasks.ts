@@ -57,7 +57,14 @@ export const useSupabaseTasks = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setTasks(data || []);
+      
+      // Type assertion to ensure proper typing
+      const typedTasks = (data || []).map(task => ({
+        ...task,
+        priority: task.priority as SupabaseTask['priority']
+      }));
+      
+      setTasks(typedTasks);
     } catch (error) {
       console.error('Error fetching tasks:', error);
       toast({
@@ -109,26 +116,39 @@ export const useSupabaseTasks = () => {
     if (!user) return;
 
     try {
+      // Ensure required fields are present
+      const insertData = {
+        title: taskData.title || '',
+        user_id: user.id,
+        description: taskData.description,
+        deadline: taskData.deadline,
+        completed: taskData.completed || false,
+        priority: taskData.priority || 'notUrgent-notImportant',
+        category_id: taskData.category_id,
+        time_estimate: taskData.time_estimate,
+        tags: taskData.tags
+      };
+
       const { data, error } = await supabase
         .from('tasks')
-        .insert([
-          {
-            ...taskData,
-            user_id: user.id
-          }
-        ])
+        .insert([insertData])
         .select()
         .single();
 
       if (error) throw error;
       
-      setTasks(prev => [data, ...prev]);
+      const typedTask = {
+        ...data,
+        priority: data.priority as SupabaseTask['priority']
+      };
+      
+      setTasks(prev => [typedTask, ...prev]);
       toast({
         title: "Task created",
         description: "Your task has been added successfully"
       });
       
-      return data;
+      return typedTask;
     } catch (error) {
       console.error('Error adding task:', error);
       toast({
@@ -154,13 +174,18 @@ export const useSupabaseTasks = () => {
 
       if (error) throw error;
       
-      setTasks(prev => prev.map(task => task.id === id ? data : task));
+      const typedTask = {
+        ...data,
+        priority: data.priority as SupabaseTask['priority']
+      };
+      
+      setTasks(prev => prev.map(task => task.id === id ? typedTask : task));
       toast({
         title: "Task updated",
         description: "Your task has been updated successfully"
       });
       
-      return data;
+      return typedTask;
     } catch (error) {
       console.error('Error updating task:', error);
       toast({
@@ -204,15 +229,15 @@ export const useSupabaseTasks = () => {
     if (!user) return;
 
     try {
+      const insertData = {
+        name,
+        color,
+        user_id: user.id
+      };
+
       const { data, error } = await supabase
         .from('categories')
-        .insert([
-          {
-            name,
-            color,
-            user_id: user.id
-          }
-        ])
+        .insert([insertData])
         .select()
         .single();
 
@@ -242,10 +267,15 @@ export const useSupabaseTasks = () => {
     try {
       // Simple scheduling algorithm: assign incomplete tasks to time blocks
       const incompleteTasks = tasks.filter(task => !task.completed && task.time_estimate);
-      const now = new Date();
-      const scheduleBlocks: Partial<SupabaseTimeBlock>[] = [];
+      const scheduleBlocks: Array<{
+        task_id: string;
+        start_time: string;
+        end_time: string;
+        user_id: string;
+        completed: boolean;
+      }> = [];
       
-      let currentTime = new Date(now);
+      let currentTime = new Date();
       currentTime.setHours(9, 0, 0, 0); // Start at 9 AM
       
       for (const task of incompleteTasks.slice(0, 5)) { // Limit to 5 tasks
