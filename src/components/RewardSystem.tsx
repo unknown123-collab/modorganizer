@@ -1,11 +1,10 @@
-
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import { Trophy, Star, Zap, Target, Clock, Brain, Award, Medal, Crown } from 'lucide-react';
-import { format, subDays, isAfter, startOfDay, endOfDay } from 'date-fns';
+import { format, subDays, isAfter, startOfDay, endOfDay, isBefore } from 'date-fns';
 
 interface Achievement {
   id: string;
