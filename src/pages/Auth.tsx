@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Brain, Target, Calendar, BarChart3 } from 'lucide-react';
+import { Loader2, Brain, Target, Calendar, BarChart3, ArrowLeft } from 'lucide-react';
 
 const Auth = () => {
   const { signIn, signUp, user } = useAuth();
@@ -25,7 +25,7 @@ const Auth = () => {
   useEffect(() => {
     if (user) {
       console.log('User authenticated, redirecting to dashboard');
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     }
   }, [user, navigate]);
 
@@ -86,6 +86,16 @@ const Auth = () => {
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         {/* Left side - Features showcase */}
         <div className="space-y-8">
+          {/* Back to home button */}
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 mb-4"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Home
+          </Button>
+          
           <div className="text-center lg:text-left">
             <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
               TaskOptimizer Pro
