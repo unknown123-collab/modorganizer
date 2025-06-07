@@ -8,12 +8,24 @@ import ProductivityStatsCard from './ProductivityStatsCard';
 import TasksProgressCard from './TasksProgressCard';
 import TipsCard from './TipsCard';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { LayoutGrid, Sparkles, LogOut, User } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { LayoutGrid, Sparkles, LogOut, User, Trophy, Target, Zap } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const { tasks } = useSupabaseTasks();
+  
+  // Calculate recent achievements
+  const completedTasks = tasks.filter(t => t.completed).length;
+  const recentAchievements = [];
+  
+  if (completedTasks >= 1 && completedTasks < 2) {
+    recentAchievements.push({ title: 'First Steps', description: 'Completed your first task!', icon: Target });
+  }
+  if (completedTasks >= 10 && completedTasks < 11) {
+    recentAchievements.push({ title: 'Task Master', description: 'Completed 10 tasks!', icon: Trophy });
+  }
   
   return (
     <div className="space-y-6">
@@ -77,6 +89,32 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Recent Achievements */}
+      {recentAchievements.length > 0 && (
+        <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-primary" />
+              Recent Achievements
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              {recentAchievements.map((achievement, index) => (
+                <div key={index} className="flex items-center gap-2 p-3 bg-white rounded-lg shadow-sm border">
+                  <achievement.icon className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium text-sm">{achievement.title}</p>
+                    <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                  </div>
+                  <Badge variant="secondary">New!</Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
       
       {/* Task Input */}
       <EnhancedTaskInput />

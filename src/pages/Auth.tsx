@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,14 +11,23 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Brain, Target, Calendar, BarChart3 } from 'lucide-react';
 
 const Auth = () => {
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     fullName: ''
   });
+
+  // Redirect if user is already authenticated
+  useEffect(() => {
+    if (user) {
+      console.log('User authenticated, redirecting to dashboard');
+      navigate('/', { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +46,7 @@ const Auth = () => {
         title: "Welcome back!",
         description: "You've been signed in successfully."
       });
+      // Navigation will happen automatically via useEffect when user state updates
     }
     
     setLoading(false);
@@ -56,7 +67,7 @@ const Auth = () => {
     } else {
       toast({
         title: "Account created!",
-        description: "Please check your email to verify your account."
+        description: "Please check your email to verify your account, or you can sign in directly if email confirmation is disabled."
       });
     }
     
