@@ -1,12 +1,17 @@
 
 import React from 'react';
-import { useTaskContext } from '@/contexts/TaskContext';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Lightbulb } from 'lucide-react';
 
 const TipsCard = () => {
-  const { getProductivityTips } = useTaskContext();
-  const tips = getProductivityTips();
+  // Static productivity tips since we don't need dynamic tips from TaskContext
+  const tips = [
+    "Break large tasks into smaller, manageable chunks",
+    "Use the Pomodoro Technique: 25 minutes focused work, 5 minute break",
+    "Prioritize tasks using the Eisenhower Matrix (urgent vs important)",
+    "Set specific deadlines for your tasks to maintain momentum",
+    "Review and adjust your task list daily to stay on track"
+  ];
   
   return (
     <Card className="h-full">
