@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { LayoutDashboard, CheckSquare, Calendar, BarChart, Menu, X } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Calendar, BarChart, Menu, X, Settings } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useNavigate } from 'react-router-dom';
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -14,16 +15,22 @@ interface MobileNavProps {
 
 const MobileNav = ({ isOpen, setIsOpen, activeView, setActiveView }: MobileNavProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   
   const handleNavigation = (view: 'dashboard' | 'tasks' | 'calendar' | 'analytics') => {
     setActiveView(view);
     setIsOpen(false);
   };
 
+  const handleSettingsClick = () => {
+    navigate('/settings');
+    setIsOpen(false);
+  };
+
   return (
     <div className="md:hidden">
       {/* Top Navigation Bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white border-b shadow-sm">
+      <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border-b border-border shadow-sm">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">T</span>
@@ -95,6 +102,17 @@ const MobileNav = ({ isOpen, setIsOpen, activeView, setActiveView }: MobileNavPr
                 <BarChart className="w-5 h-5 mr-3" />
                 <span className="font-medium">Analytics</span>
               </button>
+
+              {/* Settings */}
+              <div className="border-t border-border pt-2 mt-4">
+                <button 
+                  onClick={handleSettingsClick}
+                  className="flex items-center px-4 py-3 rounded-lg hover:bg-muted/50 w-full"
+                >
+                  <Settings className="w-5 h-5 mr-3" />
+                  <span className="font-medium">Settings</span>
+                </button>
+              </div>
             </nav>
           </SheetContent>
         </Sheet>

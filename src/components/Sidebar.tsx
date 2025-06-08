@@ -4,6 +4,7 @@ import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import { useAuth } from '@/contexts/AuthContext';
 import { LayoutDashboard, CheckSquare, Calendar, BarChart, Settings, Plus } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   activeView: 'dashboard' | 'tasks' | 'calendar' | 'analytics';
@@ -13,13 +14,14 @@ interface SidebarProps {
 const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
   const { user } = useAuth();
   const { tasks } = useSupabaseTasks();
+  const navigate = useNavigate();
   
   const completedTasks = tasks.filter(task => task.completed).length;
   const totalTasks = tasks.length;
   const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
   
   return (
-    <div className="w-full h-full bg-white border-r border-border flex flex-col shadow-lg">
+    <div className="w-full h-full bg-white dark:bg-slate-800 border-r border-border flex flex-col shadow-lg">
       {/* Header */}
       <div className="p-6 border-b border-border">
         <div className="flex items-center gap-3 mb-4">
@@ -120,7 +122,10 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
       
       {/* Settings */}
       <div className="p-4 border-t border-border">
-        <button className="flex items-center text-sm w-full px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors">
+        <button 
+          onClick={() => navigate('/settings')}
+          className="flex items-center text-sm w-full px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
+        >
           <Settings className="w-4 h-4 mr-3" />
           <span>Settings</span>
         </button>
