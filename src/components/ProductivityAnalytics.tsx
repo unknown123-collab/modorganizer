@@ -103,25 +103,112 @@ const ProductivityAnalytics = () => {
   const getInsights = () => {
     const insights = [];
     
+    // Completion rate insights
     if (analytics.completionRate > 80) {
-      insights.push({ icon: Award, text: "Excellent completion rate! You're highly productive.", type: "success" });
+      insights.push({ 
+        icon: Award, 
+        text: `Outstanding ${analytics.completionRate.toFixed(1)}% completion rate! You're maximizing productivity.`, 
+        type: "success" 
+      });
     } else if (analytics.completionRate > 60) {
-      insights.push({ icon: Target, text: "Good progress! Try to improve your completion rate.", type: "info" });
+      insights.push({ 
+        icon: Target, 
+        text: `Solid ${analytics.completionRate.toFixed(1)}% completion rate. Focus on high-priority tasks to reach 80%+.`, 
+        type: "info" 
+      });
+    } else if (analytics.completionRate > 30) {
+      insights.push({ 
+        icon: Brain, 
+        text: `${analytics.completionRate.toFixed(1)}% completion rate. Break large tasks into smaller steps for better progress.`, 
+        type: "warning" 
+      });
     } else {
-      insights.push({ icon: Brain, text: "Consider breaking down tasks into smaller, manageable pieces.", type: "warning" });
+      insights.push({ 
+        icon: Brain, 
+        text: "Low completion rate detected. Start with 2-3 small, achievable tasks today to build momentum.", 
+        type: "warning" 
+      });
     }
 
-    if (analytics.streak >= 7) {
-      insights.push({ icon: Zap, text: `Amazing ${analytics.streak}-day streak! Keep it up!`, type: "success" });
+    // Streak insights
+    if (analytics.streak >= 14) {
+      insights.push({ 
+        icon: Zap, 
+        text: `Incredible ${analytics.streak}-day streak! You've built a powerful productivity habit.`, 
+        type: "success" 
+      });
+    } else if (analytics.streak >= 7) {
+      insights.push({ 
+        icon: Zap, 
+        text: `Great ${analytics.streak}-day streak! Consistency is key to long-term success.`, 
+        type: "success" 
+      });
     } else if (analytics.streak >= 3) {
-      insights.push({ icon: TrendingUp, text: `${analytics.streak}-day streak going strong!`, type: "info" });
+      insights.push({ 
+        icon: TrendingUp, 
+        text: `${analytics.streak}-day streak building! Aim for 7 days to establish a habit.`, 
+        type: "info" 
+      });
+    } else if (analytics.streak === 0 && analytics.totalTasks > 0) {
+      insights.push({ 
+        icon: Target, 
+        text: "Complete at least one task today to start your productivity streak!", 
+        type: "info" 
+      });
     }
 
+    // Time management insights
     if (analytics.timeSpent > 40) {
-      insights.push({ icon: Clock, text: "You're putting in great hours! Remember to take breaks.", type: "info" });
+      insights.push({ 
+        icon: Clock, 
+        text: `${analytics.timeSpent} hours of focused work! Consider the 52/17 rule: 52min work, 17min break.`, 
+        type: "info" 
+      });
+    } else if (analytics.timeSpent > 20) {
+      insights.push({ 
+        icon: Clock, 
+        text: `${analytics.timeSpent} hours tracked. Use time blocks to improve focus and productivity.`, 
+        type: "info" 
+      });
     }
 
-    return insights;
+    // Priority-based insights
+    const urgentImportant = analytics.priorityDistribution.find(p => p.name === 'Urgent & Important')?.value || 0;
+    const total = analytics.totalTasks;
+    
+    if (urgentImportant > total * 0.3 && total > 5) {
+      insights.push({ 
+        icon: Brain, 
+        text: "High urgent tasks detected. Focus on prevention and planning to reduce firefighting.", 
+        type: "warning" 
+      });
+    } else if (urgentImportant === 0 && total > 3) {
+      insights.push({ 
+        icon: Award, 
+        text: "No urgent tasks! Excellent planning and time management.", 
+        type: "success" 
+      });
+    }
+
+    // Weekly trend insights
+    const recentDays = analytics.weeklyTrend.slice(-3);
+    const avgRecentRate = recentDays.reduce((sum, day) => sum + day.rate, 0) / recentDays.length;
+    
+    if (avgRecentRate > analytics.completionRate + 10) {
+      insights.push({ 
+        icon: TrendingUp, 
+        text: "Your productivity is trending upward! Keep this momentum going.", 
+        type: "success" 
+      });
+    } else if (avgRecentRate < analytics.completionRate - 10) {
+      insights.push({ 
+        icon: Brain, 
+        text: "Recent dip in productivity. Review your schedule and prioritize self-care.", 
+        type: "warning" 
+      });
+    }
+
+    return insights.slice(0, 4); // Limit to 4 most relevant insights
   };
 
   const insights = getInsights();

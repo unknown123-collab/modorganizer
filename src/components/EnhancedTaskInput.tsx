@@ -66,12 +66,29 @@ const EnhancedTaskInput = () => {
           <Button
             onClick={() => setIsOpen(true)}
             variant="ghost"
-            className="w-full h-16 text-left justify-start text-muted-foreground hover:text-foreground"
+            className="w-full h-auto p-4 text-left justify-start text-muted-foreground hover:text-foreground"
           >
-            <Plus className="mr-3 h-5 w-5" />
-            <div>
-              <div className="font-medium">Add a new task</div>
-              <div className="text-sm">What would you like to accomplish?</div>
+            <Plus className="mr-3 h-6 w-6 flex-shrink-0" />
+            <div className="space-y-2">
+              <div className="font-medium text-lg">Add a new task</div>
+              <div className="text-sm text-muted-foreground">
+                Click here to create a task. Fill in the title, set priority (Urgent & Important for deadlines), 
+                add time estimates, and set deadlines to stay organized.
+              </div>
+              <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
+                <div className="flex items-center gap-1">
+                  <Target className="h-3 w-3" />
+                  Set Priority
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  Time Estimate
+                </div>
+                <div className="flex items-center gap-1">
+                  <CalendarIcon className="h-3 w-3" />
+                  Add Deadline
+                </div>
+              </div>
             </div>
           </Button>
         </CardContent>

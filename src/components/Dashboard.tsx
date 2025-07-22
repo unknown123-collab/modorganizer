@@ -10,11 +10,30 @@ import TipsCard from './TipsCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { LayoutGrid, Sparkles, LogOut, User, Trophy, Target, Zap } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { LayoutGrid, Sparkles, LogOut, User, Trophy, Target, Zap, Moon, Sun, Monitor } from 'lucide-react';
+import { useTheme } from '@/hooks/useTheme';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const { tasks } = useSupabaseTasks();
+  useTheme();
+
+  const setTheme = (theme: string) => {
+    localStorage.setItem('theme', theme);
+    const root = window.document.documentElement;
+    
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.classList.toggle('dark', systemTheme === 'dark');
+    } else {
+      root.classList.toggle('dark', theme === 'dark');
+    }
+  };
+
+  const getCurrentTheme = () => {
+    return localStorage.getItem('theme') || 'system';
+  };
   
   // Calculate recent achievements
   const completedTasks = tasks.filter(t => t.completed).length;
@@ -44,6 +63,31 @@ const Dashboard = () => {
         </div>
         
         <div className="flex items-center gap-2">
+          <Select value={getCurrentTheme()} onValueChange={setTheme}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="light">
+                <div className="flex items-center gap-2">
+                  <Sun className="h-4 w-4" />
+                  Light
+                </div>
+              </SelectItem>
+              <SelectItem value="dark">
+                <div className="flex items-center gap-2">
+                  <Moon className="h-4 w-4" />
+                  Dark
+                </div>
+              </SelectItem>
+              <SelectItem value="system">
+                <div className="flex items-center gap-2">
+                  <Monitor className="h-4 w-4" />
+                  System
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
           <Button variant="outline" size="sm" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             Profile

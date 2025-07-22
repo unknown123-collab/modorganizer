@@ -69,12 +69,9 @@ const Landing = () => {
             AI-powered scheduling, intelligent prioritization, and productivity insights 
             to help you achieve more with less stress.
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center">
             <Button size="lg" onClick={() => navigate('/auth')}>
-              Start Free Trial
-            </Button>
-            <Button variant="outline" size="lg">
-              Watch Demo
+              Start Now!
             </Button>
           </div>
         </div>
