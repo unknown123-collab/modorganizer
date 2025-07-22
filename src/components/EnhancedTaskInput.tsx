@@ -132,9 +132,9 @@ const EnhancedTaskInput = () => {
           </div>
 
           {/* Priority and Time Estimate Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="flex items-center gap-2">
+              <Label className="flex items-center gap-2 text-sm">
                 <Target className="h-4 w-4" />
                 Priority
               </Label>
@@ -142,7 +142,7 @@ const EnhancedTaskInput = () => {
                 value={formData.priority}
                 onValueChange={(value: any) => setFormData(prev => ({ ...prev, priority: value }))}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -150,7 +150,7 @@ const EnhancedTaskInput = () => {
                     <SelectItem key={option.value} value={option.value}>
                       <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 rounded-full ${option.color}`} />
-                        {option.label}
+                        <span className="text-sm">{option.label}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -159,7 +159,7 @@ const EnhancedTaskInput = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="flex items-center gap-2">
+              <Label className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4" />
                 Time Estimate (minutes)
               </Label>
@@ -168,19 +168,20 @@ const EnhancedTaskInput = () => {
                 placeholder="30"
                 value={formData.timeEstimate}
                 onChange={(e) => setFormData(prev => ({ ...prev, timeEstimate: e.target.value }))}
+                className="h-10"
               />
             </div>
           </div>
 
           {/* Category and Deadline Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Category</Label>
+              <Label className="text-sm">Category</Label>
               <Select
                 value={formData.categoryId}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, categoryId: value }))}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-10">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -191,7 +192,7 @@ const EnhancedTaskInput = () => {
                           className="w-3 h-3 rounded-full" 
                           style={{ backgroundColor: category.color }}
                         />
-                        {category.name}
+                        <span className="text-sm">{category.name}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -200,15 +201,17 @@ const EnhancedTaskInput = () => {
             </div>
 
             <div className="space-y-2">
-              <Label>Deadline</Label>
+              <Label className="text-sm">Deadline</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                    className="w-full justify-start text-left font-normal h-10"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.deadline ? format(formData.deadline, "PPP") : "Pick a date"}
+                    <span className="text-sm">
+                      {formData.deadline ? format(formData.deadline, "PPP") : "Pick a date"}
+                    </span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -224,8 +227,8 @@ const EnhancedTaskInput = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2 pt-4">
-            <Button type="submit" className="flex-1">
+          <div className="flex flex-col sm:flex-row gap-2 pt-4">
+            <Button type="submit" className="flex-1 h-11">
               <Plus className="mr-2 h-4 w-4" />
               Create Task
             </Button>
@@ -233,6 +236,7 @@ const EnhancedTaskInput = () => {
               type="button"
               variant="outline"
               onClick={() => setIsOpen(false)}
+              className="h-11"
             >
               Cancel
             </Button>

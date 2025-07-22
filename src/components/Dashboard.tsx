@@ -49,22 +49,22 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-primary/10 rounded-lg">
-            <LayoutGrid className="h-6 w-6 text-primary" />
+            <LayoutGrid className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Welcome back, {user?.user_metadata?.full_name || user?.email}
             </p>
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <Select value={getCurrentTheme()} onValueChange={setTheme}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-full sm:w-[140px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -88,48 +88,48 @@ const Dashboard = () => {
               </SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="flex items-center gap-2 justify-center min-h-[40px]">
             <User className="h-4 w-4" />
-            Profile
+            <span className="hidden sm:inline">Profile</span>
           </Button>
           <Button 
             variant="outline" 
             size="sm" 
             onClick={signOut}
-            className="flex items-center gap-2 text-muted-foreground hover:text-destructive"
+            className="flex items-center gap-2 justify-center text-muted-foreground hover:text-destructive min-h-[40px]"
           >
             <LogOut className="h-4 w-4" />
-            Sign Out
+            <span className="hidden sm:inline">Sign Out</span>
           </Button>
         </div>
       </div>
       
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold">{tasks.length}</div>
-            <div className="text-sm opacity-90">Total Tasks</div>
+          <CardContent className="p-3 sm:p-4">
+            <div className="text-xl sm:text-2xl font-bold">{tasks.length}</div>
+            <div className="text-xs sm:text-sm opacity-90">Total Tasks</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold">{tasks.filter(t => t.completed).length}</div>
-            <div className="text-sm opacity-90">Completed</div>
+          <CardContent className="p-3 sm:p-4">
+            <div className="text-xl sm:text-2xl font-bold">{tasks.filter(t => t.completed).length}</div>
+            <div className="text-xs sm:text-sm opacity-90">Completed</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold">{tasks.filter(t => !t.completed).length}</div>
-            <div className="text-sm opacity-90">Pending</div>
+          <CardContent className="p-3 sm:p-4">
+            <div className="text-xl sm:text-2xl font-bold">{tasks.filter(t => !t.completed).length}</div>
+            <div className="text-xs sm:text-sm opacity-90">Pending</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold">
+          <CardContent className="p-3 sm:p-4">
+            <div className="text-xl sm:text-2xl font-bold">
               {tasks.length > 0 ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100) : 0}%
             </div>
-            <div className="text-sm opacity-90">Completion Rate</div>
+            <div className="text-xs sm:text-sm opacity-90">Completion Rate</div>
           </CardContent>
         </Card>
       </div>
@@ -137,22 +137,22 @@ const Dashboard = () => {
       {/* Recent Achievements */}
       {recentAchievements.length > 0 && (
         <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-primary" />
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               Recent Achievements
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
               {recentAchievements.map((achievement, index) => (
                 <div key={index} className="flex items-center gap-2 p-3 bg-white rounded-lg shadow-sm border">
-                  <achievement.icon className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="font-medium text-sm">{achievement.title}</p>
+                  <achievement.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-xs sm:text-sm">{achievement.title}</p>
                     <p className="text-xs text-muted-foreground">{achievement.description}</p>
                   </div>
-                  <Badge variant="secondary">New!</Badge>
+                  <Badge variant="secondary" className="text-xs">New!</Badge>
                 </div>
               ))}
             </div>
@@ -164,19 +164,23 @@ const Dashboard = () => {
       <EnhancedTaskInput />
       
       {/* Dashboard Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <PriorityTasksCard />
-        <ProductivityStatsCard />
-        <div className="col-span-1 md:col-span-2 lg:col-span-1">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="lg:col-span-1">
+          <PriorityTasksCard />
+        </div>
+        <div className="lg:col-span-1">
+          <ProductivityStatsCard />
+        </div>
+        <div className="lg:col-span-1">
           <TipsCard />
         </div>
       </div>
       
       {/* Progress Overview */}
-      <div className="mt-6">
+      <div>
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-semibold">Tasks Progress</h2>
+          <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+          <h2 className="text-lg sm:text-xl font-semibold">Tasks Progress</h2>
         </div>
         <TasksProgressCard />
       </div>
