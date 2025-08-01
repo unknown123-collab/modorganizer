@@ -88,7 +88,12 @@ const Dashboard = () => {
               </SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" className="flex items-center gap-2 justify-center min-h-[40px]">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => window.location.href = '/settings'}
+            className="flex items-center gap-2 justify-center min-h-[40px]"
+          >
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Profile</span>
           </Button>
@@ -106,25 +111,25 @@ const Dashboard = () => {
       
       {/* Quick Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+        <Card className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
           <CardContent className="p-3 sm:p-4">
             <div className="text-xl sm:text-2xl font-bold">{tasks.length}</div>
             <div className="text-xs sm:text-sm opacity-90">Total Tasks</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+        <Card className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white dark:from-emerald-600 dark:to-emerald-700">
           <CardContent className="p-3 sm:p-4">
             <div className="text-xl sm:text-2xl font-bold">{tasks.filter(t => t.completed).length}</div>
             <div className="text-xs sm:text-sm opacity-90">Completed</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+        <Card className="bg-gradient-to-r from-amber-500 to-amber-600 text-white dark:from-amber-600 dark:to-amber-700">
           <CardContent className="p-3 sm:p-4">
             <div className="text-xl sm:text-2xl font-bold">{tasks.filter(t => !t.completed).length}</div>
             <div className="text-xs sm:text-sm opacity-90">Pending</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+        <Card className="bg-gradient-to-r from-violet-500 to-violet-600 text-white dark:from-violet-600 dark:to-violet-700">
           <CardContent className="p-3 sm:p-4">
             <div className="text-xl sm:text-2xl font-bold">
               {tasks.length > 0 ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100) : 0}%
@@ -146,10 +151,10 @@ const Dashboard = () => {
           <CardContent>
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
               {recentAchievements.map((achievement, index) => (
-                <div key={index} className="flex items-center gap-2 p-3 bg-white rounded-lg shadow-sm border">
+                <div key={index} className="flex items-center gap-2 p-3 bg-card border border-border rounded-lg shadow-sm">
                   <achievement.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-xs sm:text-sm">{achievement.title}</p>
+                    <p className="font-medium text-xs sm:text-sm text-card-foreground">{achievement.title}</p>
                     <p className="text-xs text-muted-foreground">{achievement.description}</p>
                   </div>
                   <Badge variant="secondary" className="text-xs">New!</Badge>

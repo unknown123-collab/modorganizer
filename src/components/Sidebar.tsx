@@ -21,7 +21,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
   const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
   
   return (
-    <div className="w-full h-full bg-white dark:bg-slate-800 border-r border-border flex flex-col shadow-lg">
+    <div className="w-full h-full bg-card border-r border-border flex flex-col shadow-lg">
       {/* Header */}
       <div className="p-6 border-b border-border">
         <div className="flex items-center gap-3 mb-4">
@@ -110,7 +110,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
           </div>
           <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
             <div 
-              className="h-2 bg-gradient-to-r from-green-500 to-green-600 rounded-full transition-all duration-300" 
+              className="h-2 bg-gradient-to-r from-emerald-500 to-emerald-600 dark:from-emerald-400 dark:to-emerald-500 rounded-full transition-all duration-300" 
               style={{ width: `${completionRate}%` }}
             />
           </div>

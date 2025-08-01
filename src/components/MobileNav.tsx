@@ -30,7 +30,7 @@ const MobileNav = ({ isOpen, setIsOpen, activeView, setActiveView }: MobileNavPr
   return (
     <div className="md:hidden">
       {/* Top Navigation Bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border-b border-border shadow-sm">
+      <div className="flex items-center justify-between px-4 py-3 bg-card border-b border-border shadow-sm">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">T</span>
