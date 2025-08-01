@@ -63,34 +63,33 @@ const EnhancedTaskInput = () => {
     return (
       <Card className="border-dashed border-2 hover:border-primary/50 transition-colors">
         <CardContent className="p-6">
-          <Button
+          <div 
             onClick={() => setIsOpen(true)}
-            variant="ghost"
-            className="w-full h-auto p-4 text-left justify-start text-muted-foreground hover:text-foreground"
+            className="cursor-pointer w-full p-4 text-left rounded-lg hover:bg-muted/50 transition-colors border border-input bg-background"
           >
-            <Plus className="mr-3 h-6 w-6 flex-shrink-0" />
-            <div className="space-y-2">
-              <div className="font-medium text-lg">Add a new task</div>
-              <div className="text-sm text-muted-foreground">
-                Click here to create a task. Fill in the title, set priority (Urgent & Important for deadlines), 
-                add time estimates, and set deadlines to stay organized.
-              </div>
-              <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
-                <div className="flex items-center gap-1">
-                  <Target className="h-3 w-3" />
-                  Set Priority
+            <div className="flex items-start gap-3">
+              <Plus className="mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground" />
+              <div className="flex-1">
+                <div className="text-muted-foreground text-sm mb-1">
+                  Add a new task - click here to create task with priority, time estimates, and deadlines...
                 </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  Time Estimate
-                </div>
-                <div className="flex items-center gap-1">
-                  <CalendarIcon className="h-3 w-3" />
-                  Add Deadline
+                <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
+                  <div className="flex items-center gap-1">
+                    <Target className="h-3 w-3" />
+                    Set Priority
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    Time Estimate
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <CalendarIcon className="h-3 w-3" />
+                    Add Deadline
+                  </div>
                 </div>
               </div>
             </div>
-          </Button>
+          </div>
         </CardContent>
       </Card>
     );

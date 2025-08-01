@@ -55,7 +55,7 @@ const Dashboard = () => {
             <LayoutGrid className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
               Welcome back, {user?.user_metadata?.full_name || user?.email}
             </p>
@@ -65,7 +65,17 @@ const Dashboard = () => {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <Select value={getCurrentTheme()} onValueChange={setTheme}>
             <SelectTrigger className="w-full sm:w-[140px]">
-              <SelectValue />
+              <SelectValue>
+                <div className="flex items-center gap-2">
+                  {getCurrentTheme() === 'light' && <Sun className="h-4 w-4" />}
+                  {getCurrentTheme() === 'dark' && <Moon className="h-4 w-4" />}
+                  {getCurrentTheme() === 'system' && <Monitor className="h-4 w-4" />}
+                  <span className="capitalize">
+                    {getCurrentTheme() === 'light' ? 'Light' : 
+                     getCurrentTheme() === 'dark' ? 'Dark' : 'System'}
+                  </span>
+                </div>
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="light">
