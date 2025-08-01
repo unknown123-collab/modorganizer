@@ -77,7 +77,7 @@ const Dashboard = () => {
                 </div>
               </SelectValue>
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-popover border border-border shadow-lg z-50">
               <SelectItem value="light">
                 <div className="flex items-center gap-2">
                   <Sun className="h-4 w-4" />

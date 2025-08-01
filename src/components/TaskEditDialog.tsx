@@ -1,55 +1,60 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Plus, Sparkles, Clock, Target } from 'lucide-react';
+import { CalendarIcon, Save, X, Target, Clock } from 'lucide-react';
 import { format } from 'date-fns';
-import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
+import { useSupabaseTasks, SupabaseTask } from '@/hooks/useSupabaseTasks';
 
-const EnhancedTaskInput = () => {
-  const { addTask, categories } = useSupabaseTasks();
-  const [isOpen, setIsOpen] = useState(false);
+interface TaskEditDialogProps {
+  task: SupabaseTask | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
+  const { updateTask, categories } = useSupabaseTasks();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    priority: 'notUrgent-notImportant' as const,
+    priority: 'notUrgent-notImportant' as SupabaseTask['priority'],
     timeEstimate: '',
     categoryId: '',
     deadline: undefined as Date | undefined
   });
 
+  useEffect(() => {
+    if (task) {
+      setFormData({
+        title: task.title,
+        description: task.description || '',
+        priority: task.priority,
+        timeEstimate: task.time_estimate?.toString() || '',
+        categoryId: task.category_id || '',
+        deadline: task.deadline ? new Date(task.deadline) : undefined
+      });
+    }
+  }, [task]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title.trim()) return;
+    if (!task || !formData.title.trim()) return;
 
-    await addTask({
+    await updateTask(task.id, {
       title: formData.title,
       description: formData.description || undefined,
       priority: formData.priority,
       time_estimate: formData.timeEstimate ? parseInt(formData.timeEstimate) : undefined,
       category_id: formData.categoryId || undefined,
-      deadline: formData.deadline?.toISOString(),
-      completed: false,
-      tags: []
+      deadline: formData.deadline?.toISOString()
     });
 
-    // Reset form
-    setFormData({
-      title: '',
-      description: '',
-      priority: 'notUrgent-notImportant',
-      timeEstimate: '',
-      categoryId: '',
-      deadline: undefined
-    });
-    setIsOpen(false);
+    onOpenChange(false);
   };
 
   const priorityOptions = [
@@ -59,57 +64,22 @@ const EnhancedTaskInput = () => {
     { value: 'notUrgent-notImportant', label: 'Normal', color: 'bg-blue-500' }
   ];
 
-  if (!isOpen) {
-    return (
-      <Card className="border-dashed border-2 hover:border-primary/50 transition-colors">
-        <CardContent className="p-6">
-          <div 
-            onClick={() => setIsOpen(true)}
-            className="cursor-pointer w-full p-4 text-left rounded-lg hover:bg-muted/50 transition-colors border border-input bg-background"
-          >
-            <div className="flex items-start gap-3">
-              <Plus className="mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground" />
-              <div className="flex-1">
-                <div className="text-muted-foreground text-sm mb-1">
-                  Add a new task - click here to create task with priority, time estimates, and deadlines...
-                </div>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
-                  <div className="flex items-center gap-1">
-                    <Target className="h-3 w-3" />
-                    Set Priority
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    Time Estimate
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <CalendarIcon className="h-3 w-3" />
-                    Add Deadline
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="border-2 border-primary/20 shadow-lg">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
-          Create New Task
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[525px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5 text-primary" />
+            Edit Task
+          </DialogTitle>
+        </DialogHeader>
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Title */}
           <div className="space-y-2">
-            <Label htmlFor="title">Task Title</Label>
+            <Label htmlFor="edit-title">Task Title</Label>
             <Input
-              id="title"
+              id="edit-title"
               placeholder="What needs to be done?"
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
@@ -120,9 +90,9 @@ const EnhancedTaskInput = () => {
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description (Optional)</Label>
+            <Label htmlFor="edit-description">Description (Optional)</Label>
             <Textarea
-              id="description"
+              id="edit-description"
               placeholder="Add more details about this task..."
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -144,7 +114,7 @@ const EnhancedTaskInput = () => {
                 <SelectTrigger className="h-10">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                <SelectContent className="bg-popover border border-border shadow-lg z-[100]">
                   {priorityOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>
                       <div className="flex items-center gap-2">
@@ -183,7 +153,7 @@ const EnhancedTaskInput = () => {
                 <SelectTrigger className="h-10">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                <SelectContent className="bg-popover border border-border shadow-lg z-[100]">
                   {categories.map(category => (
                     <SelectItem key={category.id} value={category.id}>
                       <div className="flex items-center gap-2">
@@ -228,22 +198,23 @@ const EnhancedTaskInput = () => {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-2 pt-4">
             <Button type="submit" className="flex-1 h-11">
-              <Plus className="mr-2 h-4 w-4" />
-              Create Task
+              <Save className="mr-2 h-4 w-4" />
+              Update Task
             </Button>
             <Button
               type="button"
               variant="outline"
-              onClick={() => setIsOpen(false)}
+              onClick={() => onOpenChange(false)}
               className="h-11"
             >
+              <X className="mr-2 h-4 w-4" />
               Cancel
             </Button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-export default EnhancedTaskInput;
+export default TaskEditDialog;

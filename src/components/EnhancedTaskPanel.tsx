@@ -7,14 +7,17 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CheckSquare, Clock, Calendar, Search, Filter, Trash2, Edit, Target } from 'lucide-react';
-import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
+import { useSupabaseTasks, SupabaseTask } from '@/hooks/useSupabaseTasks';
 import { format, isToday, isTomorrow, isPast } from 'date-fns';
+import TaskEditDialog from './TaskEditDialog';
 
 const EnhancedTaskPanel = () => {
   const { tasks, categories, updateTask, deleteTask, loading } = useSupabaseTasks();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterPriority, setFilterPriority] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [editingTask, setEditingTask] = useState<SupabaseTask | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const priorityColors = {
     'urgent-important': 'bg-red-500',
@@ -44,6 +47,11 @@ const EnhancedTaskPanel = () => {
 
   const handleCompleteTask = async (taskId: string, completed: boolean) => {
     await updateTask(taskId, { completed });
+  };
+
+  const handleEditTask = (task: SupabaseTask) => {
+    setEditingTask(task);
+    setEditDialogOpen(true);
   };
 
   const getDeadlineStatus = (deadline?: string) => {
@@ -117,7 +125,7 @@ const EnhancedTaskPanel = () => {
                 <Filter className="mr-2 h-4 w-4" />
                 <SelectValue placeholder="Filter by priority" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover border border-border shadow-lg z-50">
                 <SelectItem value="all">All Priorities</SelectItem>
                 <SelectItem value="urgent-important">Urgent & Important</SelectItem>
                 <SelectItem value="urgent-notImportant">Urgent</SelectItem>
@@ -130,7 +138,7 @@ const EnhancedTaskPanel = () => {
               <SelectTrigger>
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover border border-border shadow-lg z-50">
                 <SelectItem value="all">All Tasks</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="completed">Completed</SelectItem>
@@ -221,7 +229,7 @@ const EnhancedTaskPanel = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {/* TODO: Implement edit */}}
+                      onClick={() => handleEditTask(task)}
                       className="text-muted-foreground hover:text-foreground"
                     >
                       <Edit className="h-4 w-4" />
@@ -241,6 +249,16 @@ const EnhancedTaskPanel = () => {
           ))
         )}
       </div>
+
+      {/* Edit Task Dialog */}
+      <TaskEditDialog
+        task={editingTask}
+        open={editDialogOpen}
+        onOpenChange={(open) => {
+          setEditDialogOpen(open);
+          if (!open) setEditingTask(null);
+        }}
+      />
     </div>
   );
 };
