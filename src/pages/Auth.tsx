@@ -99,12 +99,28 @@ const Auth = () => {
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
-    const { error } = await signInWithGoogle();
-    if (error) {
-      toast({ title: 'Google sign-in failed', description: error.message, variant: 'destructive' });
+    try {
+      const { error } = await signInWithGoogle();
+      if (error) {
+        console.error('Google sign-in error:', error);
+        toast({ 
+          title: 'Google sign-in failed', 
+          description: error.message || 'Failed to initiate Google sign-in', 
+          variant: 'destructive' 
+        });
+        setLoading(false);
+      } else {
+        toast({ title: 'Redirecting to Google...', description: 'Please complete sign-in in the popup window.' });
+        // Don't set loading to false here - let the auth state change handle it
+      }
+    } catch (err) {
+      console.error('Unexpected error during Google sign-in:', err);
+      toast({ 
+        title: 'Sign-in Error', 
+        description: 'An unexpected error occurred', 
+        variant: 'destructive' 
+      });
       setLoading(false);
-    } else {
-      toast({ title: 'Redirecting...', description: 'Continue with Google.' });
     }
   };
 
