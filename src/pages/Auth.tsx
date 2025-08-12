@@ -394,8 +394,9 @@ const Auth = () => {
                   </DialogContent>
                 </Dialog>
 
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
       </div>
     </div>
   );
