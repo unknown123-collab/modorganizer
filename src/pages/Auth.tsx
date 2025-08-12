@@ -9,9 +9,11 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Brain, Target, Calendar, BarChart3, ArrowLeft } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, signInWithGoogle, resetPasswordForEmail, updatePassword } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -20,6 +22,11 @@ const Auth = () => {
     password: '',
     fullName: ''
   });
+  const [resetOpen, setResetOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [recoveryOpen, setRecoveryOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Redirect if user is already authenticated
   useEffect(() => {
@@ -28,6 +35,15 @@ const Auth = () => {
       navigate('/dashboard', { replace: true });
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setRecoveryOpen(true);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +95,54 @@ const Auth = () => {
       ...prev,
       [e.target.name]: e.target.value
     }));
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    const { error } = await signInWithGoogle();
+    if (error) {
+      toast({ title: 'Google sign-in failed', description: error.message, variant: 'destructive' });
+      setLoading(false);
+    } else {
+      toast({ title: 'Redirecting...', description: 'Continue with Google.' });
+    }
+  };
+
+  const handleSendResetEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const targetEmail = resetEmail || formData.email;
+    const { error } = await resetPasswordForEmail(targetEmail);
+    if (error) {
+      toast({ title: 'Reset failed', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Email sent', description: 'Check your inbox for the reset link.' });
+      setResetOpen(false);
+    }
+    setLoading(false);
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 6) {
+      toast({ title: 'Password too short', description: 'Use at least 6 characters.', variant: 'destructive' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: "Passwords don't match", description: 'Please re-type them.', variant: 'destructive' });
+      return;
+    }
+    setLoading(true);
+    const { error } = await updatePassword(newPassword);
+    if (error) {
+      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Password updated', description: 'You can now sign in with your new password.' });
+      setRecoveryOpen(false);
+      setNewPassword('');
+      setConfirmPassword('');
+    }
+    setLoading(false);
   };
 
   return (
@@ -184,9 +248,28 @@ const Auth = () => {
                         disabled={loading}
                       />
                     </div>
+                    <div className="text-right">
+                      <button
+                        type="button"
+                        className="text-sm underline text-muted-foreground hover:text-foreground"
+                        onClick={() => setResetOpen(true)}
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Sign In
+                    </Button>
+                    <div className="text-center text-sm text-muted-foreground">or</div>
+                    <Button type="button" variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={loading}>
+                      <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="#EA4335" d="M12 10.2v3.6h5.1c-.2 1.3-1.5 3.9-5.1 3.9-3.1 0-5.6-2.6-5.6-5.7s2.5-5.7 5.6-5.7c1.8 0 3 .7 3.7 1.3l2.5-2.4C16.6 3.9 14.5 3 12 3 6.9 3 2.8 7.1 2.8 12.2S6.9 21.4 12 21.4c6.8 0 9.4-4.8 9.4-7.2 0-.5 0-.8-.1-1.2H12z"/>
+                        <path fill="#34A853" d="M3.6 7.4l3 2.2c.8-2.1 2.7-3.6 5.4-3.6 1.8 0 3 .7 3.7 1.3l2.5-2.4C16.6 3.9 14.5 3 12 3 8 3 4.7 5.2 3.6 7.4z"/>
+                        <path fill="#FBBC05" d="M12 21.4c2.5 0 4.6-.8 6.1-2.1l-3-2.5c-.8.5-1.9.9-3.1.9-2.4 0-4.4-1.6-5.1-3.7l-3 2.3c1.1 2.2 3.4 5.1 8.1 5.1z"/>
+                        <path fill="#4285F4" d="M21.4 12.2c0-.5 0-.8-.1-1.2H12v3.6h5.1c-.3 1.7-1.7 3.9-5.1 3.9-3.1 0-5.6-2.6-5.6-5.7 0-.9.2-1.8.6-2.6l-3-2.2c-.7 1.4-1.1 3-1.1 4.8 0 5.1 4.1 9.2 9.2 9.2 5.3 0 9.2-3.7 9.2-9.8z"/>
+                      </svg>
+                      Continue with Google
                     </Button>
                   </form>
                 </TabsContent>
@@ -237,8 +320,80 @@ const Auth = () => {
                     </Button>
                   </form>
                 </TabsContent>
-              </Tabs>
-            </CardContent>
+                </Tabs>
+
+                {/* Password Reset Dialog */}
+                <Dialog open={resetOpen} onOpenChange={setResetOpen}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Reset your password</DialogTitle>
+                      <DialogDescription>We'll email you a reset link.</DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSendResetEmail} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="resetEmail">Email</Label>
+                        <Input
+                          id="resetEmail"
+                          type="email"
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                          placeholder="you@example.com"
+                          required
+                          disabled={loading}
+                        />
+                      </div>
+                      <DialogFooter>
+                        <Button type="submit" disabled={loading}>
+                          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          Send reset link
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+
+                {/* New Password Dialog (after recovery link) */}
+                <Dialog open={recoveryOpen} onOpenChange={setRecoveryOpen}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Set a new password</DialogTitle>
+                      <DialogDescription>Enter and confirm your new password.</DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleUpdatePassword} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="newPassword">New Password</Label>
+                        <Input
+                          id="newPassword"
+                          type="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder="New password"
+                          required
+                          disabled={loading}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="confirmPassword">Confirm Password</Label>
+                        <Input
+                          id="confirmPassword"
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Confirm password"
+                          required
+                          disabled={loading}
+                        />
+                      </div>
+                      <DialogFooter>
+                        <Button type="submit" disabled={loading}>
+                          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          Update password
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+
           </Card>
         </div>
       </div>

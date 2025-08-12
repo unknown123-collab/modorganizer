@@ -10,6 +10,9 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithGoogle: () => Promise<{ error: any }>;
+  resetPasswordForEmail: (email: string) => Promise<{ error: any }>;
+  updatePassword: (newPassword: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -70,6 +73,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
+  const signInWithGoogle = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/auth` }
+    });
+    if (!error) {
+      console.log('Google OAuth initiated', data?.provider);
+    }
+    return { error };
+  };
+
+  const resetPasswordForEmail = async (email: string) => {
+    const redirectTo = `${window.location.origin}/auth`;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+    if (!error) {
+      console.log('Password reset email sent');
+    }
+    return { error };
+  };
+
+  const updatePassword = async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (!error) {
+      console.log('Password updated');
+    }
+    return { error };
+  };
+  
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -80,6 +111,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
+    resetPasswordForEmail,
+    updatePassword,
     signOut
   };
 
