@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LayoutDashboard, CheckSquare, Calendar, BarChart, Menu, X, Settings } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Calendar, BarChart, Menu, X, Settings, Archive } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -9,15 +9,15 @@ import { useNavigate } from 'react-router-dom';
 interface MobileNavProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  activeView: 'dashboard' | 'tasks' | 'calendar' | 'analytics';
-  setActiveView: (view: 'dashboard' | 'tasks' | 'calendar' | 'analytics') => void;
+  activeView: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive';
+  setActiveView: (view: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive') => void;
 }
 
 const MobileNav = ({ isOpen, setIsOpen, activeView, setActiveView }: MobileNavProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   
-  const handleNavigation = (view: 'dashboard' | 'tasks' | 'calendar' | 'analytics') => {
+  const handleNavigation = (view: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive') => {
     setActiveView(view);
     setIsOpen(false);
   };
@@ -103,6 +103,16 @@ const MobileNav = ({ isOpen, setIsOpen, activeView, setActiveView }: MobileNavPr
                 <span className="font-medium">Analytics</span>
               </button>
 
+              <button 
+                onClick={() => handleNavigation('archive')}
+                className={`flex items-center px-4 py-3 rounded-lg ${
+                  activeView === 'archive' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted/50'
+                }`}
+              >
+                <Archive className="w-5 h-5 mr-3" />
+                <span className="font-medium">Archive</span>
+              </button>
+
               {/* Settings */}
               <div className="border-t border-border pt-2 mt-4">
                 <button 
@@ -125,6 +135,7 @@ const MobileNav = ({ isOpen, setIsOpen, activeView, setActiveView }: MobileNavPr
           {activeView === 'tasks' && 'Tasks'}
           {activeView === 'calendar' && 'Calendar'}
           {activeView === 'analytics' && 'Analytics'}
+          {activeView === 'archive' && 'Archive'}
         </h2>
       </div>
     </div>

@@ -2,13 +2,13 @@
 import React from 'react';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import { useAuth } from '@/contexts/AuthContext';
-import { LayoutDashboard, CheckSquare, Calendar, BarChart, Settings, Plus } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Calendar, BarChart, Settings, Archive } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
-  activeView: 'dashboard' | 'tasks' | 'calendar' | 'analytics';
-  setActiveView: (view: 'dashboard' | 'tasks' | 'calendar' | 'analytics') => void;
+  activeView: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive';
+  setActiveView: (view: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive') => void;
 }
 
 const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
@@ -98,6 +98,21 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
         >
           <BarChart className="w-5 h-5 mr-3" />
           <span className="font-medium">Analytics</span>
+        </button>
+
+        <button 
+          onClick={() => setActiveView('archive')}
+          className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${
+            activeView === 'archive' ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-muted/50'
+          }`}
+        >
+          <Archive className="w-5 h-5 mr-3" />
+          <span className="font-medium">Archive</span>
+          {completedTasks > 0 && (
+            <span className="ml-auto bg-muted text-muted-foreground text-xs px-2 py-1 rounded-full">
+              {completedTasks}
+            </span>
+          )}
         </button>
       </nav>
       

@@ -7,13 +7,14 @@ import Sidebar from '@/components/Sidebar';
 import EnhancedTaskPanel from '@/components/EnhancedTaskPanel';
 import Analytics from '@/components/Analytics';
 import EnhancedCalendar from '@/components/EnhancedCalendar';
+import Archive from '@/pages/Archive';
 import MobileNav from '@/components/MobileNav';
 import { Loader2 } from 'lucide-react';
 
 const Index = () => {
   const { user, loading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeView, setActiveView] = useState<'dashboard' | 'tasks' | 'calendar' | 'analytics'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive'>('dashboard');
   
   // Show loading spinner while checking auth
   if (loading) {
@@ -54,6 +55,7 @@ const Index = () => {
           {activeView === 'tasks' && <EnhancedTaskPanel />}
           {activeView === 'calendar' && <EnhancedCalendar />}
           {activeView === 'analytics' && <Analytics />}
+          {activeView === 'archive' && <Archive />}
         </div>
       </div>
     </div>
