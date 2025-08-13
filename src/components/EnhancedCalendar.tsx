@@ -85,10 +85,23 @@ const EnhancedCalendar = () => {
           <Clock className="h-6 w-6 text-primary" />
           <h1 className="text-3xl font-bold">Calendar</h1>
         </div>
-        <Button onClick={generateSchedule} className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4" />
-          Generate Smart Schedule
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={() => generateSchedule(selectedDate)} 
+            className="flex items-center gap-2"
+          >
+            <Sparkles className="h-4 w-4" />
+            Generate Schedule for {format(selectedDate, 'MMM d')}
+          </Button>
+          <Button 
+            onClick={() => generateSchedule()} 
+            variant="outline" 
+            className="flex items-center gap-2"
+          >
+            <Sparkles className="h-4 w-4" />
+            Generate Full Schedule
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

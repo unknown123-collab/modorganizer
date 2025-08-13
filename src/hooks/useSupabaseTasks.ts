@@ -261,12 +261,67 @@ export const useSupabaseTasks = () => {
   };
 
   // Generate schedule
-  const generateSchedule = async () => {
+  const generateSchedule = async (specificDate?: Date) => {
     if (!user) return;
 
     try {
-      // Simple scheduling algorithm: assign incomplete tasks to time blocks
-      const incompleteTasks = tasks.filter(task => !task.completed && task.time_estimate);
+      // Get incomplete tasks that need scheduling
+      const incompleteTasks = tasks.filter(task => !task.completed);
+      
+      if (incompleteTasks.length === 0) {
+        toast({
+          title: "No tasks to schedule",
+          description: "All tasks are completed or you have no tasks to schedule"
+        });
+        return;
+      }
+
+      // Determine starting date and time
+      let currentTime = new Date();
+      
+      if (specificDate) {
+        // If specific date is provided, start scheduling from that date
+        currentTime = new Date(specificDate);
+        currentTime.setHours(9, 0, 0, 0); // Start at 9 AM on the specific date
+      } else {
+        // Default behavior - start from now or next available time
+        const now = new Date();
+        currentTime = new Date(now);
+        
+        // If it's past 5 PM or weekend, move to next work day at 9 AM
+        if (currentTime.getHours() >= 17 || currentTime.getDay() === 0 || currentTime.getDay() === 6) {
+          currentTime.setDate(currentTime.getDate() + 1);
+          // Skip weekends
+          while (currentTime.getDay() === 0 || currentTime.getDay() === 6) {
+            currentTime.setDate(currentTime.getDate() + 1);
+          }
+          currentTime.setHours(9, 0, 0, 0);
+        }
+      }
+      
+      // Sort tasks by priority and deadline
+      const sortedTasks = incompleteTasks.sort((a, b) => {
+        // Priority order
+        const priorityOrder = {
+          'urgent-important': 1,
+          'urgent-notImportant': 2,
+          'notUrgent-important': 3,
+          'notUrgent-notImportant': 4
+        };
+        
+        const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
+        if (priorityDiff !== 0) return priorityDiff;
+        
+        // Then by deadline if both have them
+        if (a.deadline && b.deadline) {
+          return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+        }
+        if (a.deadline) return -1;
+        if (b.deadline) return 1;
+        
+        return 0;
+      });
+      
       const scheduleBlocks: Array<{
         task_id: string;
         start_time: string;
@@ -275,23 +330,62 @@ export const useSupabaseTasks = () => {
         completed: boolean;
       }> = [];
       
-      let currentTime = new Date();
-      currentTime.setHours(9, 0, 0, 0); // Start at 9 AM
-      
-      for (const task of incompleteTasks.slice(0, 5)) { // Limit to 5 tasks
-        const endTime = new Date(currentTime);
-        endTime.setMinutes(endTime.getMinutes() + (task.time_estimate || 30));
+      for (const task of sortedTasks) {
+        // Skip if task already has a time block
+        const existingBlock = timeBlocks.find(block => block.task_id === task.id);
+        if (existingBlock) continue;
+        
+        const duration = task.time_estimate || 60; // Default 1 hour
+        const endTime = new Date(currentTime.getTime() + duration * 60 * 1000);
+        
+        // Check if we're going past 5 PM, move to next work day
+        if (endTime.getHours() >= 17) {
+          currentTime.setDate(currentTime.getDate() + 1);
+          // Skip weekends
+          while (currentTime.getDay() === 0 || currentTime.getDay() === 6) {
+            currentTime.setDate(currentTime.getDate() + 1);
+          }
+          currentTime.setHours(9, 0, 0, 0);
+        }
+        
+        // Check for existing blocks on this time slot to avoid conflicts
+        const blockStartTime = new Date(currentTime);
+        const blockEndTime = new Date(currentTime.getTime() + duration * 60 * 1000);
+        
+        // Find conflicts with existing time blocks
+        const hasConflict = timeBlocks.some(existingBlock => {
+          const existingStart = new Date(existingBlock.start_time);
+          const existingEnd = new Date(existingBlock.end_time);
+          
+          return (blockStartTime < existingEnd && blockEndTime > existingStart);
+        });
+        
+        // If there's a conflict, move to the next available slot
+        if (hasConflict) {
+          // Find the next available slot
+          const dayBlocks = timeBlocks
+            .filter(block => {
+              const blockDate = new Date(block.start_time);
+              return blockDate.toDateString() === currentTime.toDateString();
+            })
+            .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+          
+          if (dayBlocks.length > 0) {
+            const lastBlock = dayBlocks[dayBlocks.length - 1];
+            currentTime = new Date(new Date(lastBlock.end_time).getTime() + 15 * 60 * 1000); // 15 min buffer
+          }
+        }
         
         scheduleBlocks.push({
           task_id: task.id,
-          start_time: currentTime.toISOString(),
-          end_time: endTime.toISOString(),
+          start_time: new Date(currentTime).toISOString(),
+          end_time: new Date(currentTime.getTime() + duration * 60 * 1000).toISOString(),
           user_id: user.id,
           completed: false
         });
         
-        currentTime = new Date(endTime);
-        currentTime.setMinutes(currentTime.getMinutes() + 15); // 15 min break
+        // Move to next time slot with 15 min break
+        currentTime = new Date(currentTime.getTime() + duration * 60 * 1000 + 15 * 60 * 1000);
       }
       
       if (scheduleBlocks.length > 0) {
@@ -305,7 +399,12 @@ export const useSupabaseTasks = () => {
         setTimeBlocks(prev => [...(data || []), ...prev]);
         toast({
           title: "Schedule generated",
-          description: `${scheduleBlocks.length} time blocks created`
+          description: `${scheduleBlocks.length} time blocks created${specificDate ? ` for ${specificDate.toLocaleDateString()}` : ''}`
+        });
+      } else {
+        toast({
+          title: "No new blocks created",
+          description: "All tasks already have time blocks assigned"
         });
       }
     } catch (error) {
