@@ -33,9 +33,9 @@ const MobileNav = ({ isOpen, setIsOpen, activeView, setActiveView }: MobileNavPr
       <div className="flex items-center justify-between px-4 py-3 bg-card border-b border-border shadow-sm">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">T</span>
+            <span className="text-white font-bold text-sm">M</span>
           </div>
-          <h1 className="text-lg font-bold">TaskOptimizer</h1>
+          <h1 className="text-lg font-bold">MODO</h1>
         </div>
         <Sheet>
           <SheetTrigger asChild>

@@ -178,7 +178,7 @@ const Auth = () => {
           
           <div className="text-center lg:text-left">
             <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-              TaskOptimizer Pro
+              MODO
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
               Intelligent task management with AI-powered scheduling and productivity insights

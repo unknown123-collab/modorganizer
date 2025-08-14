@@ -26,11 +26,10 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
       <div className="p-6 border-b border-border">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">T</span>
+            <span className="text-white font-bold text-lg">M</span>
           </div>
           <div>
-            <h1 className="text-lg font-bold">TaskOptimizer</h1>
-            <p className="text-xs text-muted-foreground">Pro</p>
+            <h1 className="text-lg font-bold">MODO</h1>
           </div>
         </div>
         
