@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const TaskPanel = () => {
-  const { tasks, updateTask, deleteTask } = useSupabaseTasks();
+  const { tasks, updateTask, deleteTask, archiveTask } = useSupabaseTasks();
   const [filter, setFilter] = useState<string>('all');
   
   const filteredTasks = tasks.filter(task => {
@@ -46,7 +46,13 @@ const TaskPanel = () => {
   const completeTask = async (taskId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (task) {
-      await updateTask(taskId, { completed: !task.completed });
+      if (!task.completed) {
+        // Archive completed tasks
+        await archiveTask(taskId);
+      } else {
+        // Just toggle completion if unarchiving
+        await updateTask(taskId, { completed: false });
+      }
     }
   };
   

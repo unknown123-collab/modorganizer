@@ -33,17 +33,11 @@ const handler = async (req: Request): Promise<Response> => {
       .from('time_blocks')
       .select(`
         *,
-        tasks:task_id (
+        tasks!time_blocks_task_id_fkey (
           id,
           title,
-          description
-        ),
-        profiles:user_id (
-          email,
-          full_name
-        ),
-        user_settings:user_id (
-          email_notifications
+          description,
+          user_id
         )
       `)
       .gte('start_time', tomorrow.toISOString())
@@ -52,27 +46,42 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (tomorrowError) {
       console.error("Error fetching tomorrow's time blocks:", tomorrowError);
-      throw tomorrowError;
     }
 
-    console.log(`📨 Found ${tomorrowBlocks?.length || 0} time blocks for tomorrow`);
+    // Filter blocks and get user details
+    let filteredTomorrowBlocks = [];
+    if (tomorrowBlocks && tomorrowBlocks.length > 0) {
+      for (const block of tomorrowBlocks) {
+        if (block.tasks) {
+          // Get user profile and settings
+          const [profileResult, settingsResult] = await Promise.all([
+            supabase.from('profiles').select('email, full_name').eq('id', block.tasks.user_id).single(),
+            supabase.from('user_settings').select('email_notifications').eq('user_id', block.tasks.user_id).single()
+          ]);
+          
+          if (profileResult.data && (!settingsResult.data || settingsResult.data.email_notifications !== false)) {
+            filteredTomorrowBlocks.push({
+              ...block,
+              profile: profileResult.data,
+              settings: settingsResult.data || { email_notifications: true }
+            });
+          }
+        }
+      }
+    }
+
+    console.log(`📨 Found ${filteredTomorrowBlocks?.length || 0} time blocks for tomorrow`);
 
     // Get time blocks scheduled for today (for today reminders) - only for users with notifications enabled
     const { data: todayBlocks, error: todayError } = await supabase
       .from('time_blocks')
       .select(`
         *,
-        tasks:task_id (
+        tasks!time_blocks_task_id_fkey (
           id,
           title,
-          description
-        ),
-        profiles:user_id (
-          email,
-          full_name
-        ),
-        user_settings:user_id (
-          email_notifications
+          description,
+          user_id
         )
       `)
       .gte('start_time', today.toISOString())
@@ -81,17 +90,38 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (todayError) {
       console.error("Error fetching today's time blocks:", todayError);
-      throw todayError;
     }
 
-    console.log(`📨 Found ${todayBlocks?.length || 0} time blocks for today`);
+    // Filter blocks and get user details
+    let filteredTodayBlocks = [];
+    if (todayBlocks && todayBlocks.length > 0) {
+      for (const block of todayBlocks) {
+        if (block.tasks) {
+          // Get user profile and settings
+          const [profileResult, settingsResult] = await Promise.all([
+            supabase.from('profiles').select('email, full_name').eq('id', block.tasks.user_id).single(),
+            supabase.from('user_settings').select('email_notifications').eq('user_id', block.tasks.user_id).single()
+          ]);
+          
+          if (profileResult.data && (!settingsResult.data || settingsResult.data.email_notifications !== false)) {
+            filteredTodayBlocks.push({
+              ...block,
+              profile: profileResult.data,
+              settings: settingsResult.data || { email_notifications: true }
+            });
+          }
+        }
+      }
+    }
+
+    console.log(`📨 Found ${filteredTodayBlocks?.length || 0} time blocks for today`);
 
     let emailsSent = 0;
 
     // Send tomorrow reminders
-    if (tomorrowBlocks && tomorrowBlocks.length > 0) {
-      for (const block of tomorrowBlocks) {
-        if (block.tasks && block.profiles && block.user_settings?.email_notifications !== false) {
+    if (filteredTomorrowBlocks && filteredTomorrowBlocks.length > 0) {
+      for (const block of filteredTomorrowBlocks) {
+        if (block.tasks && block.profile) {
           try {
             const response = await fetch(`${supabaseUrl}/functions/v1/send-task-reminder`, {
               method: 'POST',
@@ -100,8 +130,8 @@ const handler = async (req: Request): Promise<Response> => {
                 'Authorization': `Bearer ${supabaseServiceKey}`,
               },
               body: JSON.stringify({
-                email: block.profiles.email,
-                userName: block.profiles.full_name || 'there',
+                email: block.profile.email,
+                userName: block.profile.full_name || 'there',
                 taskTitle: block.tasks.title,
                 taskDescription: block.tasks.description,
                 scheduledDate: block.start_time,
@@ -123,9 +153,9 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Send today reminders
-    if (todayBlocks && todayBlocks.length > 0) {
-      for (const block of todayBlocks) {
-        if (block.tasks && block.profiles && block.user_settings?.email_notifications !== false) {
+    if (filteredTodayBlocks && filteredTodayBlocks.length > 0) {
+      for (const block of filteredTodayBlocks) {
+        if (block.tasks && block.profile) {
           try {
             const response = await fetch(`${supabaseUrl}/functions/v1/send-task-reminder`, {
               method: 'POST',
@@ -134,8 +164,8 @@ const handler = async (req: Request): Promise<Response> => {
                 'Authorization': `Bearer ${supabaseServiceKey}`,
               },
               body: JSON.stringify({
-                email: block.profiles.email,
-                userName: block.profiles.full_name || 'there',
+                email: block.profile.email,
+                userName: block.profile.full_name || 'there',
                 taskTitle: block.tasks.title,
                 taskDescription: block.tasks.description,
                 scheduledDate: block.start_time,
@@ -159,8 +189,8 @@ const handler = async (req: Request): Promise<Response> => {
     const result = {
       success: true,
       message: `Task reminder check completed`,
-      tomorrowTasksFound: tomorrowBlocks?.length || 0,
-      todayTasksFound: todayBlocks?.length || 0,
+      tomorrowTasksFound: filteredTomorrowBlocks?.length || 0,
+      todayTasksFound: filteredTodayBlocks?.length || 0,
       emailsSent,
       timestamp: new Date().toISOString()
     };

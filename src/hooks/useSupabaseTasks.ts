@@ -10,6 +10,7 @@ export interface SupabaseTask {
   description?: string;
   deadline?: string;
   completed: boolean;
+  archived: boolean;
   priority: 'urgent-important' | 'urgent-notImportant' | 'notUrgent-important' | 'notUrgent-notImportant';
   category_id?: string;
   time_estimate?: number;
@@ -54,6 +55,7 @@ export const useSupabaseTasks = () => {
         .from('tasks')
         .select('*')
         .eq('user_id', user.id)
+        .eq('archived', false)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -123,6 +125,7 @@ export const useSupabaseTasks = () => {
         description: taskData.description,
         deadline: taskData.deadline,
         completed: taskData.completed || false,
+        archived: false,
         priority: taskData.priority || 'notUrgent-notImportant',
         category_id: taskData.category_id,
         time_estimate: taskData.time_estimate,
@@ -179,11 +182,20 @@ export const useSupabaseTasks = () => {
         priority: data.priority as SupabaseTask['priority']
       };
       
-      setTasks(prev => prev.map(task => task.id === id ? typedTask : task));
-      toast({
-        title: "Task updated",
-        description: "Your task has been updated successfully"
-      });
+      // If task is archived, remove from current tasks list
+      if (typedTask.archived) {
+        setTasks(prev => prev.filter(task => task.id !== id));
+        toast({
+          title: "Task archived",
+          description: "Your task has been moved to archive"
+        });
+      } else {
+        setTasks(prev => prev.map(task => task.id === id ? typedTask : task));
+        toast({
+          title: "Task updated",
+          description: "Your task has been updated successfully"
+        });
+      }
       
       return typedTask;
     } catch (error) {
@@ -265,8 +277,8 @@ export const useSupabaseTasks = () => {
     if (!user) return;
 
     try {
-      // Get incomplete tasks that need scheduling
-      const incompleteTasks = tasks.filter(task => !task.completed);
+      // Get incomplete, non-archived tasks that need scheduling
+      const incompleteTasks = tasks.filter(task => !task.completed && !task.archived);
       
       if (incompleteTasks.length === 0) {
         toast({
@@ -439,6 +451,18 @@ export const useSupabaseTasks = () => {
       fetchTasks();
       fetchCategories();
       fetchTimeBlocks();
+    },
+    // Archive management
+    archiveTask: (id: string) => updateTask(id, { completed: true, archived: true }),
+    getArchivedTasks: async () => {
+      if (!user) return [];
+      const { data } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('archived', true)
+        .order('updated_at', { ascending: false });
+      return data || [];
     }
   };
 };
