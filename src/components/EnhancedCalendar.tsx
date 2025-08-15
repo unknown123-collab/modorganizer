@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +19,7 @@ const EnhancedCalendar = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
   
   // Fetch current user's notification settings
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchNotificationSettings = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
