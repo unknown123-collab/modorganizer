@@ -223,8 +223,10 @@ export type Database = {
         Row: {
           break_time: number | null
           created_at: string | null
+          email_notifications: boolean | null
           focus_time: number | null
           notifications: boolean | null
+          reminder_times: string[] | null
           theme: string | null
           updated_at: string | null
           user_id: string
@@ -235,8 +237,10 @@ export type Database = {
         Insert: {
           break_time?: number | null
           created_at?: string | null
+          email_notifications?: boolean | null
           focus_time?: number | null
           notifications?: boolean | null
+          reminder_times?: string[] | null
           theme?: string | null
           updated_at?: string | null
           user_id: string
@@ -247,8 +251,10 @@ export type Database = {
         Update: {
           break_time?: number | null
           created_at?: string | null
+          email_notifications?: boolean | null
           focus_time?: number | null
           notifications?: boolean | null
+          reminder_times?: string[] | null
           theme?: string | null
           updated_at?: string | null
           user_id?: string

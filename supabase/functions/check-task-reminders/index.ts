@@ -28,7 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`📅 Today: ${today.toISOString()}, Tomorrow: ${tomorrow.toISOString()}`);
 
-    // Get time blocks scheduled for tomorrow (for tomorrow reminders)
+    // Get time blocks scheduled for tomorrow (for tomorrow reminders) - only for users with notifications enabled
     const { data: tomorrowBlocks, error: tomorrowError } = await supabase
       .from('time_blocks')
       .select(`
@@ -41,6 +41,9 @@ const handler = async (req: Request): Promise<Response> => {
         profiles:user_id (
           email,
           full_name
+        ),
+        user_settings:user_id (
+          email_notifications
         )
       `)
       .gte('start_time', tomorrow.toISOString())
@@ -54,7 +57,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`📨 Found ${tomorrowBlocks?.length || 0} time blocks for tomorrow`);
 
-    // Get time blocks scheduled for today (for today reminders)
+    // Get time blocks scheduled for today (for today reminders) - only for users with notifications enabled
     const { data: todayBlocks, error: todayError } = await supabase
       .from('time_blocks')
       .select(`
@@ -67,6 +70,9 @@ const handler = async (req: Request): Promise<Response> => {
         profiles:user_id (
           email,
           full_name
+        ),
+        user_settings:user_id (
+          email_notifications
         )
       `)
       .gte('start_time', today.toISOString())
@@ -85,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send tomorrow reminders
     if (tomorrowBlocks && tomorrowBlocks.length > 0) {
       for (const block of tomorrowBlocks) {
-        if (block.tasks && block.profiles) {
+        if (block.tasks && block.profiles && block.user_settings?.email_notifications !== false) {
           try {
             const response = await fetch(`${supabaseUrl}/functions/v1/send-task-reminder`, {
               method: 'POST',
@@ -119,7 +125,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send today reminders
     if (todayBlocks && todayBlocks.length > 0) {
       for (const block of todayBlocks) {
-        if (block.tasks && block.profiles) {
+        if (block.tasks && block.profiles && block.user_settings?.email_notifications !== false) {
           try {
             const response = await fetch(`${supabaseUrl}/functions/v1/send-task-reminder`, {
               method: 'POST',

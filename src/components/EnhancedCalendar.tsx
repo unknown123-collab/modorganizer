@@ -4,14 +4,94 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Clock, AlertCircle, Sparkles } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { ChevronLeft, ChevronRight, Clock, AlertCircle, Sparkles, Bell, BellOff } from 'lucide-react';
 import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const EnhancedCalendar = () => {
   const { tasks, timeBlocks, generateSchedule, categories } = useSupabaseTasks();
+  const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewDate, setViewDate] = useState<Date>(new Date());
+  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
+  
+  // Fetch current user's notification settings
+  React.useEffect(() => {
+    const fetchNotificationSettings = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('user_settings')
+          .select('email_notifications')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (data) {
+          setNotificationsEnabled(data.email_notifications ?? true);
+        }
+      }
+    };
+    
+    fetchNotificationSettings();
+  }, []);
+
+  // Toggle notifications
+  const handleNotificationToggle = async (enabled: boolean) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('user_settings')
+      .upsert({
+        user_id: user.id,
+        email_notifications: enabled
+      });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update notification settings",
+        variant: "destructive",
+      });
+    } else {
+      setNotificationsEnabled(enabled);
+      toast({
+        title: "Settings Updated",
+        description: enabled ? "Email notifications enabled" : "Email notifications disabled",
+      });
+    }
+  };
+
+  // Test notification system
+  const testNotifications = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('check-task-reminders', {
+        body: { test: true }
+      });
+
+      if (error) {
+        toast({
+          title: "Test Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Test Successful",
+          description: `Reminder check completed. ${data?.emailsSent || 0} emails sent.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Test Failed",
+        description: "Unable to test notification system",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Get tasks for selected date
   const tasksForSelectedDate = useMemo(() => {
@@ -86,6 +166,29 @@ const EnhancedCalendar = () => {
           <h1 className="text-3xl font-bold">Calendar</h1>
         </div>
         <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mr-4">
+            {notificationsEnabled ? (
+              <Bell className="h-4 w-4 text-primary" />
+            ) : (
+              <BellOff className="h-4 w-4 text-muted-foreground" />
+            )}
+            <Switch
+              checked={notificationsEnabled}
+              onCheckedChange={handleNotificationToggle}
+            />
+            <span className="text-sm font-medium">
+              {notificationsEnabled ? 'Notifications On' : 'Notifications Off'}
+            </span>
+          </div>
+          <Button 
+            onClick={testNotifications}
+            variant="outline" 
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Bell className="h-4 w-4" />
+            Test
+          </Button>
           <Button 
             onClick={() => generateSchedule(selectedDate)} 
             className="flex items-center gap-2"
