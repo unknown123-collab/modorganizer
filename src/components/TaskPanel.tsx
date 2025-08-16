@@ -14,7 +14,10 @@ const TaskPanel = () => {
   const { tasks, updateTask, deleteTask, archiveTask } = useSupabaseTasks();
   const [filter, setFilter] = useState<string>('all');
   
+  // Only show non-archived tasks
   const filteredTasks = tasks.filter(task => {
+    if (task.archived) return false; // Don't show archived tasks
+    
     if (filter === 'all') return true;
     if (filter === 'completed') return task.completed;
     if (filter === 'pending') return !task.completed;

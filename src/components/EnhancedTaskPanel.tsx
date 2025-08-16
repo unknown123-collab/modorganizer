@@ -12,7 +12,7 @@ import { format, isToday, isTomorrow, isPast } from 'date-fns';
 import TaskEditDialog from './TaskEditDialog';
 
 const EnhancedTaskPanel = () => {
-  const { tasks, categories, updateTask, deleteTask, loading } = useSupabaseTasks();
+  const { tasks, categories, updateTask, deleteTask, archiveTask, loading } = useSupabaseTasks();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterPriority, setFilterPriority] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -33,20 +33,29 @@ const EnhancedTaskPanel = () => {
     'notUrgent-notImportant': 'Normal'
   };
 
-  // Filter tasks
+  // Filter tasks - only show non-archived tasks
   const filteredTasks = tasks.filter(task => {
+    // Don't show archived tasks in the main task view
+    if (task.archived) return false;
+    
     const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (task.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
     const matchesPriority = filterPriority === 'all' || task.priority === filterPriority;
     const matchesStatus = filterStatus === 'all' || 
-                         (filterStatus === 'completed' && task.completed) ||
+                         (filterStatus === 'completed' && task.completed && !task.archived) ||
                          (filterStatus === 'pending' && !task.completed);
     
     return matchesSearch && matchesPriority && matchesStatus;
   });
 
   const handleCompleteTask = async (taskId: string, completed: boolean) => {
-    await updateTask(taskId, { completed });
+    if (completed) {
+      // When marking as complete, archive the task
+      await archiveTask(taskId);
+    } else {
+      // When unchecking, just update the completed status (don't unarchive)
+      await updateTask(taskId, { completed: false });
+    }
   };
 
   const handleEditTask = (task: SupabaseTask) => {
@@ -102,7 +111,7 @@ const EnhancedTaskPanel = () => {
         <CheckSquare className="h-6 w-6 text-primary" />
         <h1 className="text-3xl font-bold">Tasks</h1>
         <Badge variant="secondary" className="ml-2">
-          {tasks.length}
+          {filteredTasks.length}
         </Badge>
       </div>
 
