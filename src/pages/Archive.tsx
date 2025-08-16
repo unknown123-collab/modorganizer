@@ -9,14 +9,12 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import type { SupabaseTask } from '@/hooks/useSupabaseTasks';
-import Sidebar from '@/components/Sidebar';
 
 const ArchivePage = () => {
   const { updateTask, deleteTask, getArchivedTasks } = useSupabaseTasks();
   const [archivedTasks, setArchivedTasks] = useState<SupabaseTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
-  const [activeView, setActiveView] = useState<'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive'>('archive');
   
   const filteredTasks = archivedTasks.filter(task => {
     if (filter === 'all') return true;
@@ -193,16 +191,7 @@ const ArchivePage = () => {
     );
   };
   
-  return (
-    <div className="flex h-screen bg-background">
-      <div className="w-80 flex-shrink-0">
-        <Sidebar activeView={activeView} setActiveView={setActiveView} />
-      </div>
-      <main className="flex-1 overflow-auto p-6">
-        {renderMainContent()}
-      </main>
-    </div>
-  );
+  return renderMainContent();
 };
 
 export default ArchivePage;
