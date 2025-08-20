@@ -55,7 +55,6 @@ export const useSupabaseTasks = () => {
         .from('tasks')
         .select('*')
         .eq('user_id', user.id)
-        .eq('archived', false)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -182,15 +181,15 @@ export const useSupabaseTasks = () => {
         priority: data.priority as SupabaseTask['priority']
       };
       
-      // If task is archived, remove from current tasks list
+      // Update task in the list
+      setTasks(prev => prev.map(task => task.id === id ? typedTask : task));
+      
       if (typedTask.archived) {
-        setTasks(prev => prev.filter(task => task.id !== id));
         toast({
           title: "Task archived",
           description: "Your task has been moved to archive"
         });
       } else {
-        setTasks(prev => prev.map(task => task.id === id ? typedTask : task));
         toast({
           title: "Task updated",
           description: "Your task has been updated successfully"
