@@ -53,8 +53,8 @@ const EnhancedTaskPanel = () => {
       // When marking as complete, archive the task
       await archiveTask(taskId);
     } else {
-      // When unchecking, just update the completed status (don't unarchive)
-      await updateTask(taskId, { completed: false });
+      // When unchecking, unarchive the task and mark as incomplete
+      await updateTask(taskId, { completed: false, archived: false });
     }
   };
 

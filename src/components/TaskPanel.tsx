@@ -53,8 +53,8 @@ const TaskPanel = () => {
         // Archive completed tasks
         await archiveTask(taskId);
       } else {
-        // Just toggle completion if unarchiving
-        await updateTask(taskId, { completed: false });
+        // When unchecking, unarchive the task and mark as incomplete
+        await updateTask(taskId, { completed: false, archived: false });
       }
     }
   };
