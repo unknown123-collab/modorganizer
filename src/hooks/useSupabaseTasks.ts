@@ -11,6 +11,7 @@ export interface SupabaseTask {
   deadline?: string;
   completed: boolean;
   archived: boolean;
+  archived_at?: string;
   priority: 'urgent-important' | 'urgent-notImportant' | 'notUrgent-important' | 'notUrgent-notImportant';
   category_id?: string;
   time_estimate?: number;
@@ -452,7 +453,8 @@ export const useSupabaseTasks = () => {
       fetchTimeBlocks();
     },
     // Archive management
-    archiveTask: (id: string) => updateTask(id, { completed: true, archived: true }),
+    archiveTask: (id: string) => updateTask(id, { archived: true, archived_at: new Date().toISOString() }),
+    unarchiveTask: (id: string) => updateTask(id, { archived: false, archived_at: null }),
     getArchivedTasks: async () => {
       if (!user) return [];
       const { data } = await supabase
@@ -460,7 +462,7 @@ export const useSupabaseTasks = () => {
         .select('*')
         .eq('user_id', user.id)
         .eq('archived', true)
-        .order('updated_at', { ascending: false });
+        .order('archived_at', { ascending: false });
       return data || [];
     }
   };

@@ -139,10 +139,11 @@ const TaskPanel = () => {
                     <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => completeTask(task.id)}>
-                      {task.completed ? 'Mark as Incomplete' : 'Mark as Complete'}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => deleteTask(task.id)}>Delete</DropdownMenuItem>
+                     <DropdownMenuItem onClick={() => completeTask(task.id)}>
+                       {task.completed ? 'Mark as Incomplete' : 'Mark as Complete'}
+                     </DropdownMenuItem>
+                     <DropdownMenuItem onClick={() => archiveTask(task.id)}>Archive</DropdownMenuItem>
+                     <DropdownMenuItem onClick={() => deleteTask(task.id)}>Delete</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
