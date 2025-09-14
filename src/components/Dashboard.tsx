@@ -6,6 +6,7 @@ import EnhancedTaskInput from './EnhancedTaskInput';
 import PriorityTasksCard from './PriorityTasksCard';
 import ProductivityStatsCard from './ProductivityStatsCard';
 import TasksProgressCard from './TasksProgressCard';
+import GamificationCard from './GamificationCard';
 import TipsCard from './TipsCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -187,9 +188,12 @@ const Dashboard = () => {
           <ProductivityStatsCard />
         </div>
         <div className="lg:col-span-1">
-          <TipsCard />
+          <GamificationCard />
         </div>
       </div>
+      
+      {/* Tips Section */}
+      <TipsCard />
       
       {/* Progress Overview */}
       <div>

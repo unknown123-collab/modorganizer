@@ -1,6 +1,8 @@
 
 import React, { useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useProfile } from '@/hooks/useProfile';
+import { useUserSettings } from '@/hooks/useUserSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,17 +11,20 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Save, Moon, Sun, Monitor, ArrowLeft } from 'lucide-react';
+import { Camera, Save, Moon, Sun, Monitor, ArrowLeft, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
   const { user } = useAuth();
+  const { profile, loading: profileLoading, updateProfile } = useProfile();
+  const { settings, loading: settingsLoading, updateSettings } = useUserSettings();
   const { toast } = useToast();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
-  const [avatarUrl, setAvatarUrl] = useState(user?.user_metadata?.avatar_url || '');
+  const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -27,6 +32,23 @@ const Settings = () => {
     }
     return 'system';
   });
+
+  // Update form fields when profile loads
+  React.useEffect(() => {
+    if (profile) {
+      setFullName(profile.full_name || '');
+      setUsername(profile.username || '');
+      setAvatarUrl(profile.avatar_url || '');
+    }
+  }, [profile]);
+
+  // Update theme from settings
+  React.useEffect(() => {
+    if (settings?.theme) {
+      setTheme(settings.theme);
+      applyTheme(settings.theme);
+    }
+  }, [settings]);
 
   const applyTheme = (newTheme: string) => {
     const root = window.document.documentElement;
@@ -41,13 +63,14 @@ const Settings = () => {
     localStorage.setItem('theme', newTheme);
   };
 
-  const handleThemeChange = (newTheme: string) => {
+  const handleThemeChange = async (newTheme: string) => {
     setTheme(newTheme);
     applyTheme(newTheme);
-    toast({
-      title: "Theme updated",
-      description: `Switched to ${newTheme} mode`,
-    });
+    
+    // Update theme in user settings
+    if (settings) {
+      await updateSettings({ theme: newTheme });
+    }
   };
 
   const handleAvatarClick = () => {
@@ -95,29 +118,17 @@ const Settings = () => {
   };
 
   const handleSaveProfile = async () => {
-    if (!user) return;
+    if (!user || !profile) return;
 
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: {
-          full_name: fullName,
-          avatar_url: avatarUrl,
-        }
+      await updateProfile({
+        full_name: fullName,
+        username: username,
+        avatar_url: avatarUrl,
       });
-
-      if (error) throw error;
-
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been saved successfully",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Update failed",
-        description: error.message,
-        variant: "destructive",
-      });
+    } catch (error) {
+      // Error already handled in updateProfile
     } finally {
       setIsLoading(false);
     }
@@ -133,6 +144,18 @@ const Settings = () => {
         return <Monitor className="h-4 w-4" />;
     }
   };
+
+  // Show loading state
+  if (profileLoading || settingsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
@@ -169,9 +192,9 @@ const Settings = () => {
                 <div className="relative">
                   <Avatar className="w-20 h-20 cursor-pointer" onClick={handleAvatarClick}>
                     <AvatarImage src={avatarUrl} />
-                    <AvatarFallback className="bg-primary text-primary-foreground text-lg">
-                      {fullName?.[0] || user?.email?.[0]?.toUpperCase()}
-                    </AvatarFallback>
+                  <AvatarFallback className="bg-primary text-primary-foreground text-lg">
+                    {fullName?.[0] || username?.[0] || user?.email?.[0]?.toUpperCase()}
+                  </AvatarFallback>
                   </Avatar>
                   <Button
                     size="icon"
@@ -210,6 +233,21 @@ const Settings = () => {
                   placeholder="Enter your full name"
                   className="w-full"
                 />
+              </div>
+
+              {/* Username Field */}
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Choose a unique username"
+                  className="w-full"
+                />
+                <p className="text-xs text-muted-foreground">
+                  This will be your unique identifier
+                </p>
               </div>
 
               {/* Email Field (readonly) */}
