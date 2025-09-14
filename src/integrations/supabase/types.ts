@@ -46,6 +46,7 @@ export type Database = {
           full_name: string | null
           id: string
           updated_at: string | null
+          username: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -54,6 +55,7 @@ export type Database = {
           full_name?: string | null
           id: string
           updated_at?: string | null
+          username?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -62,6 +64,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string | null
+          username?: string | null
         }
         Relationships: []
       }
@@ -131,6 +134,7 @@ export type Database = {
       tasks: {
         Row: {
           archived: boolean
+          archived_at: string | null
           category_id: string | null
           completed: boolean | null
           created_at: string | null
@@ -146,6 +150,7 @@ export type Database = {
         }
         Insert: {
           archived?: boolean
+          archived_at?: string | null
           category_id?: string | null
           completed?: boolean | null
           created_at?: string | null
@@ -161,6 +166,7 @@ export type Database = {
         }
         Update: {
           archived?: boolean
+          archived_at?: string | null
           category_id?: string | null
           completed?: boolean | null
           created_at?: string | null
