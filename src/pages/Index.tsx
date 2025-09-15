@@ -5,6 +5,7 @@ import { Navigate } from 'react-router-dom';
 import Dashboard from '@/components/Dashboard';
 import Sidebar from '@/components/Sidebar';
 import EnhancedTaskPanel from '@/components/EnhancedTaskPanel';
+import EnhancedTaskManagement from '@/components/EnhancedTaskManagement';
 import Analytics from '@/components/Analytics';
 import EnhancedCalendar from '@/components/EnhancedCalendar';
 import Archive from '@/pages/Archive';
@@ -52,7 +53,7 @@ const Index = () => {
       <div className="flex-1 overflow-auto">
         <div className="p-3 sm:p-4 lg:p-6 max-w-full">
           {activeView === 'dashboard' && <Dashboard />}
-          {activeView === 'tasks' && <EnhancedTaskPanel />}
+          {activeView === 'tasks' && <EnhancedTaskManagement />}
           {activeView === 'calendar' && <EnhancedCalendar />}
           {activeView === 'analytics' && <Analytics />}
           {activeView === 'archive' && <Archive />}

@@ -12,7 +12,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 
 const TaskPanel = () => {
-  const { tasks, updateTask, deleteTask, archiveTask, isLoading } = useSupabaseTasks();
+  const { tasks, updateTask, deleteTask, archiveTask, loading } = useSupabaseTasks();
   const [filter, setFilter] = useState<string>('all');
   
   const filteredTasks = tasks.filter(task => {
@@ -76,7 +76,7 @@ const TaskPanel = () => {
       {/* Filters */}
       <div className="flex justify-between items-center">
         <div className="text-sm font-medium">
-          {!isLoading && `${filteredTasks.length} ${filteredTasks.length === 1 ? 'task' : 'tasks'}`}
+          {!loading && `${filteredTasks.length} ${filteredTasks.length === 1 ? 'task' : 'tasks'}`}
         </div>
         
         <div className="flex items-center gap-2">
@@ -100,7 +100,7 @@ const TaskPanel = () => {
       
       {/* Task List */}
       <div className="space-y-2">
-        {isLoading ? (
+        {loading ? (
           renderLoadingSkeleton()
         ) : filteredTasks.length > 0 ? (
           filteredTasks.map(task => (
