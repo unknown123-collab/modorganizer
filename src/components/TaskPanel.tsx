@@ -2,21 +2,21 @@
 import React, { useState } from 'react';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import TaskInput from './TaskInput';
-import { CheckCheck, MoreHorizontal, Filter } from 'lucide-react';
+import { CheckCheck, MoreHorizontal, Filter, Inbox } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const TaskPanel = () => {
-  const { tasks, updateTask, deleteTask, archiveTask } = useSupabaseTasks();
+  const { tasks, updateTask, deleteTask, archiveTask, isLoading } = useSupabaseTasks();
   const [filter, setFilter] = useState<string>('all');
   
-  // Only show non-archived tasks
   const filteredTasks = tasks.filter(task => {
-    if (task.archived) return false; // Don't show archived tasks
+    if (task.archived) return false;
     
     if (filter === 'all') return true;
     if (filter === 'completed') return task.completed;
@@ -49,26 +49,34 @@ const TaskPanel = () => {
   const completeTask = async (taskId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (task) {
-      if (!task.completed) {
-        // Archive completed tasks
-        await archiveTask(taskId);
-      } else {
-        // When unchecking, unarchive the task and mark as incomplete
-        await updateTask(taskId, { completed: false, archived: false });
-      }
+      await updateTask(taskId, { completed: !task.completed });
     }
   };
   
+  const renderLoadingSkeleton = () => (
+    <div className="space-y-2">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="p-4 rounded-lg border bg-card flex items-center gap-4">
+          <Skeleton className="h-5 w-5 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Tasks</h1>
+      <h1 className="text-3xl font-bold text-foreground">Tasks</h1>
       
       <TaskInput />
       
       {/* Filters */}
       <div className="flex justify-between items-center">
         <div className="text-sm font-medium">
-          {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
+          {!isLoading && `${filteredTasks.length} ${filteredTasks.length === 1 ? 'task' : 'tasks'}`}
         </div>
         
         <div className="flex items-center gap-2">
@@ -92,7 +100,9 @@ const TaskPanel = () => {
       
       {/* Task List */}
       <div className="space-y-2">
-        {filteredTasks.length > 0 ? (
+        {isLoading ? (
+          renderLoadingSkeleton()
+        ) : filteredTasks.length > 0 ? (
           filteredTasks.map(task => (
             <div 
               key={task.id} 
@@ -102,11 +112,11 @@ const TaskPanel = () => {
                 <div className="flex items-start gap-3 flex-1">
                   <button 
                     onClick={() => completeTask(task.id)}
-                    className={`mt-0.5 h-5 w-5 rounded-full border flex items-center justify-center ${
+                    className={`mt-0.5 h-5 w-5 rounded-full border flex items-center justify-center transition-colors ${
                       task.completed ? 'bg-primary border-primary' : 'border-muted-foreground'
                     }`}
                   >
-                    {task.completed && <CheckCheck className="h-3 w-3 text-white" />}
+                    {task.completed && <CheckCheck className="h-3 w-3 text-primary-foreground" />}
                   </button>
                   
                   <div className="flex-1">
@@ -139,9 +149,7 @@ const TaskPanel = () => {
                     <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => completeTask(task.id)}>
-                      {task.completed ? 'Mark as Incomplete' : 'Mark as Complete'}
-                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => archiveTask(task.id)}>Archive</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => deleteTask(task.id)}>Delete</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -149,8 +157,14 @@ const TaskPanel = () => {
             </div>
           ))
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            No tasks found. Add a task to get started!
+          <div className="text-center py-12 border-2 border-dashed border-muted-foreground/20 rounded-lg">
+            <Inbox className="mx-auto h-12 w-12 text-muted-foreground/40" />
+            <h3 className="mt-4 text-lg font-medium text-muted-foreground">
+              You're all caught up!
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground/60">
+              Add a new task above to get started.
+            </p>
           </div>
         )}
       </div>
