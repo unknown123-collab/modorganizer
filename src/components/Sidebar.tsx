@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import { useAuth } from '@/contexts/AuthContext';
 import { LayoutDashboard, CheckSquare, Calendar, BarChart, Settings, Archive } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
+import { ThemeToggle } from './ThemeToggle';
 
 interface SidebarProps {
   activeView: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive';
@@ -21,7 +21,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
   const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
   
   return (
-    <div className="w-full h-full bg-card border-r border-border flex flex-col shadow-lg">
+    <div className="w-full h-full bg-card text-card-foreground border-r border-border flex flex-col shadow-lg">
       {/* Header */}
       <div className="p-6 border-b border-border">
         <div className="flex items-center gap-3 mb-4">
@@ -29,7 +29,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
             <span className="text-white font-bold text-lg">M</span>
           </div>
           <div>
-            <h1 className="text-lg font-bold">MODO</h1>
+            <h1 className="text-lg font-bold text-foreground">MODO</h1>
           </div>
         </div>
         
@@ -42,7 +42,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium truncate">
+            <p className="text-sm font-medium truncate text-foreground">
               {user?.user_metadata?.full_name || 'User'}
             </p>
             <p className="text-xs text-muted-foreground truncate">
@@ -57,7 +57,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
         <button 
           onClick={() => setActiveView('dashboard')}
           className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${
-            activeView === 'dashboard' ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-muted/50'
+            activeView === 'dashboard' ? 'bg-accent text-accent-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
           }`}
         >
           <LayoutDashboard className="w-5 h-5 mr-3" />
@@ -67,7 +67,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
         <button 
           onClick={() => setActiveView('tasks')}
           className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${
-            activeView === 'tasks' ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-muted/50'
+            activeView === 'tasks' ? 'bg-accent text-accent-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
           }`}
         >
           <CheckSquare className="w-5 h-5 mr-3" />
@@ -82,7 +82,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
         <button 
           onClick={() => setActiveView('calendar')}
           className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${
-            activeView === 'calendar' ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-muted/50'
+            activeView === 'calendar' ? 'bg-accent text-accent-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
           }`}
         >
           <Calendar className="w-5 h-5 mr-3" />
@@ -92,7 +92,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
         <button 
           onClick={() => setActiveView('analytics')}
           className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${
-            activeView === 'analytics' ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-muted/50'
+            activeView === 'analytics' ? 'bg-accent text-accent-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
           }`}
         >
           <BarChart className="w-5 h-5 mr-3" />
@@ -102,7 +102,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
         <button 
           onClick={() => setActiveView('archive')}
           className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${
-            activeView === 'archive' ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-muted/50'
+            activeView === 'archive' ? 'bg-accent text-accent-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
           }`}
         >
           <Archive className="w-5 h-5 mr-3" />
@@ -119,7 +119,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
       <div className="p-4 border-t border-border">
         <div className="mb-3">
           <div className="flex items-center justify-between text-sm mb-2">
-            <span className="font-medium">Progress</span>
+            <span className="font-medium text-foreground">Progress</span>
             <span className="text-muted-foreground">{Math.round(completionRate)}%</span>
           </div>
           <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
@@ -134,15 +134,16 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
         </div>
       </div>
       
-      {/* Settings */}
-      <div className="p-4 border-t border-border">
+      {/* Settings & Theme Toggle */}
+      <div className="p-4 border-t border-border flex items-center justify-between">
         <button 
           onClick={() => navigate('/settings')}
-          className="flex items-center text-sm w-full px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
+          className="flex items-center text-sm px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
         >
           <Settings className="w-4 h-4 mr-3" />
-          <span>Settings</span>
+          <span className="text-foreground">Settings</span>
         </button>
+        <ThemeToggle />
       </div>
     </div>
   );
