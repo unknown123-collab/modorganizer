@@ -1,18 +1,42 @@
 import React, { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line, PieChart, Pie, Cell, Area, AreaChart
-} from 'recharts';
-import { 
-  Calendar, Clock, Target, TrendingUp, Brain, 
-  Zap, Timer, CheckCircle2, AlertCircle 
-} from 'lucide-react';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import { format, subDays, startOfDay, isWithinInterval } from 'date-fns';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts';
+import { 
+  TrendingUp, 
+  Clock, 
+  Target, 
+  Award,
+  Calendar,
+  BarChart3,
+  PieChart as PieIcon,
+  Activity,
+  Brain,
+  Zap,
+  Timer,
+  CheckCircle2,
+  AlertCircle
+} from 'lucide-react';
+import { RealTimeAnalytics } from './RealTimeAnalytics';
+import { PerformanceOptimizer } from './PerformanceOptimizer';
+import { EnhancedTimeTracking } from './EnhancedTimeTracking';
 
 const AdvancedAnalytics = () => {
   const { tasks, timeBlocks } = useSupabaseTasks();
@@ -80,13 +104,16 @@ const AdvancedAnalytics = () => {
     });
 
     // Task completion rate by category
-    const categories = [...new Set(tasks.map(t => t.category_id).filter(Boolean))];
+    const categories = [...new Set(tasks.map(t => {
+        const categoryId = t.category_id;
+        return categoryId ? categoryId : null;
+      }).filter(Boolean))];
     const categoryData = categories.map(categoryId => {
       const categoryTasks = tasks.filter(t => t.category_id === categoryId);
       const completed = categoryTasks.filter(t => t.completed).length;
       
       return {
-        category: `Category ${categoryId?.slice(-4)}`,
+        category: `Category ${String(categoryId).slice(-4)}`,
         total: categoryTasks.length,
         completed,
         rate: categoryTasks.length > 0 ? Math.round((completed / categoryTasks.length) * 100) : 0
@@ -109,7 +136,7 @@ const AdvancedAnalytics = () => {
       !t.completed && 
       t.deadline && 
       new Date(t.deadline) > now &&
-      new Date(t.deadline) <= subDays(now, -7)
+      new Date(t.deadline) <= new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
     ).length;
 
     return {
@@ -135,12 +162,10 @@ const AdvancedAnalytics = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <Brain className="h-6 w-6 text-primary" />
-        <h2 className="text-3xl font-bold">Advanced Analytics</h2>
-      </div>
-
-      {/* Key Metrics Cards */}
+      {/* Real-time Analytics */}
+      <RealTimeAnalytics />
+      
+      {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -192,6 +217,13 @@ const AdvancedAnalytics = () => {
         </Card>
       </div>
 
+      {/* Enhanced Time Tracking */}
+      <EnhancedTimeTracking />
+      
+      {/* Performance Optimizer */}
+      <PerformanceOptimizer />
+      
+      {/* Charts */}
       <Tabs defaultValue="trends" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="trends">Trends</TabsTrigger>

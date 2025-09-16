@@ -2,11 +2,12 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ProductivityAnalytics from './ProductivityAnalytics';
-import RewardSystem from './RewardSystem';
-import AdvancedAnalytics from './AdvancedAnalytics';
-import AIInsights from './AIInsights';
-import SmartTaskSuggestions from './SmartTaskSuggestions';
+import ProductivityAnalytics from '@/components/ProductivityAnalytics';
+import AIInsights from '@/components/AIInsights';
+import SmartTaskSuggestions from '@/components/SmartTaskSuggestions';
+import RewardSystem from '@/components/RewardSystem';
+import AdvancedAnalytics from '@/components/AdvancedAnalytics';
+import { NotificationSystem } from '@/components/NotificationSystem';
 import { BarChart3, Trophy, TrendingUp, Brain, Sparkles } from 'lucide-react';
 
 const Analytics = () => {
@@ -18,7 +19,7 @@ const Analytics = () => {
       </div>
 
       <Tabs defaultValue="advanced" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="advanced" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
             Advanced
@@ -34,6 +35,10 @@ const Analytics = () => {
           <TabsTrigger value="rewards" className="flex items-center gap-2">
             <Trophy className="h-4 w-4" />
             Achievements
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            Notifications
           </TabsTrigger>
         </TabsList>
         
@@ -54,6 +59,10 @@ const Analytics = () => {
         
         <TabsContent value="rewards" className="space-y-6">
           <RewardSystem />
+        </TabsContent>
+
+        <TabsContent value="notifications" className="space-y-6">
+          <NotificationSystem />
         </TabsContent>
       </Tabs>
     </div>
