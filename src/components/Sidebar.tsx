@@ -7,8 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
 
 interface SidebarProps {
-  activeView: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive';
-  setActiveView: (view: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive') => void;
+  activeView: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive' | 'collaboration' | 'integrations' | 'reports' | 'workspaces';
+  setActiveView: (view: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive' | 'collaboration' | 'integrations' | 'reports' | 'workspaces') => void;
 }
 
 const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {

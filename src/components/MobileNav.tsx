@@ -9,8 +9,8 @@ import { useNavigate } from 'react-router-dom';
 interface MobileNavProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  activeView: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive';
-  setActiveView: (view: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive') => void;
+  activeView: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive' | 'collaboration' | 'integrations' | 'reports' | 'workspaces';
+  setActiveView: (view: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive' | 'collaboration' | 'integrations' | 'reports' | 'workspaces') => void;
 }
 
 const MobileNav = ({ isOpen, setIsOpen, activeView, setActiveView }: MobileNavProps) => {

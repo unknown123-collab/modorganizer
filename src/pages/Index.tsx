@@ -10,12 +10,17 @@ import Analytics from '@/components/Analytics';
 import EnhancedCalendar from '@/components/EnhancedCalendar';
 import Archive from '@/pages/Archive';
 import MobileNav from '@/components/MobileNav';
+import CollaborationHub from '@/components/CollaborationHub';
+import IntegrationHub from '@/components/IntegrationHub';
+import AdvancedReports from '@/components/AdvancedReports';
+import WorkspaceManager from '@/components/WorkspaceManager';
+import TeamManagement from '@/components/TeamManagement';
 import { Loader2 } from 'lucide-react';
 
 const Index = () => {
   const { user, loading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeView, setActiveView] = useState<'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive' | 'collaboration' | 'integrations' | 'reports' | 'workspaces'>('dashboard');
   
   // Show loading spinner while checking auth
   if (loading) {
@@ -57,6 +62,10 @@ const Index = () => {
           {activeView === 'calendar' && <EnhancedCalendar />}
           {activeView === 'analytics' && <Analytics />}
           {activeView === 'archive' && <Archive />}
+          {activeView === 'collaboration' && <CollaborationHub />}
+          {activeView === 'integrations' && <IntegrationHub />}
+          {activeView === 'reports' && <AdvancedReports />}
+          {activeView === 'workspaces' && <WorkspaceManager />}
         </div>
       </div>
     </div>
