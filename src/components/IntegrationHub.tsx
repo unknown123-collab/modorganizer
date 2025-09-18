@@ -29,6 +29,23 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Utility functions
+const getStatusIcon = (status: Integration['status']) => {
+  switch (status) {
+    case 'connected': return <CheckCircle className="h-4 w-4 text-green-500" />;
+    case 'requires-setup': return <AlertCircle className="h-4 w-4 text-orange-500" />;
+    default: return null;
+  }
+};
+
+const getStatusBadge = (status: Integration['status']) => {
+  switch (status) {
+    case 'connected': return <Badge className="bg-green-100 text-green-800 border-green-200">Connected</Badge>;
+    case 'requires-setup': return <Badge variant="outline" className="border-orange-200 text-orange-800">Setup Required</Badge>;
+    default: return <Badge variant="outline">Available</Badge>;
+  }
+};
+
 interface Integration {
   id: string;
   name: string;
@@ -130,21 +147,6 @@ const IntegrationHub = () => {
     setSelectedIntegration(integration);
   };
 
-  const getStatusIcon = (status: Integration['status']) => {
-    switch (status) {
-      case 'connected': return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'requires-setup': return <AlertCircle className="h-4 w-4 text-orange-500" />;
-      default: return null;
-    }
-  };
-
-  const getStatusBadge = (status: Integration['status']) => {
-    switch (status) {
-      case 'connected': return <Badge className="bg-green-100 text-green-800 border-green-200">Connected</Badge>;
-      case 'requires-setup': return <Badge variant="outline" className="border-orange-200 text-orange-800">Setup Required</Badge>;
-      default: return <Badge variant="outline">Available</Badge>;
-    }
-  };
 
   const addWebhook = (webhook: Omit<WebhookConfig, 'id'>) => {
     const newWebhook: WebhookConfig = {
@@ -155,21 +157,6 @@ const IntegrationHub = () => {
     toast.success('Webhook added successfully');
   };
 
-  const getStatusIcon = (status: Integration['status']) => {
-    switch (status) {
-      case 'connected': return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'requires-setup': return <AlertCircle className="h-4 w-4 text-orange-500" />;
-      default: return null;
-    }
-  };
-
-  const getStatusBadge = (status: Integration['status']) => {
-    switch (status) {
-      case 'connected': return <Badge className="bg-green-100 text-green-800 border-green-200">Connected</Badge>;
-      case 'requires-setup': return <Badge variant="outline" className="border-orange-200 text-orange-800">Setup Required</Badge>;
-      default: return <Badge variant="outline">Available</Badge>;
-    }
-  };
 
   const getCategoryIntegrations = (category: Integration['category']) => {
     return integrations.filter(integration => integration.category === category);

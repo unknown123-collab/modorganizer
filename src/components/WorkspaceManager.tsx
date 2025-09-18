@@ -39,6 +39,31 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Utility functions
+const getTypeIcon = (type: Workspace['type']) => {
+  switch (type) {
+    case 'personal': return <User className="h-4 w-4" />;
+    case 'team': return <Users className="h-4 w-4" />;
+    case 'enterprise': return <Building2 className="h-4 w-4" />;
+  }
+};
+
+const getPrivacyIcon = (privacy: Workspace['privacy']) => {
+  switch (privacy) {
+    case 'private': return <Lock className="h-4 w-4" />;
+    case 'team': return <Users className="h-4 w-4" />;
+    case 'public': return <Globe className="h-4 w-4" />;
+  }
+};
+
+const getTypeBadgeVariant = (type: Workspace['type']) => {
+  switch (type) {
+    case 'personal': return 'outline' as const;
+    case 'team': return 'secondary' as const;
+    case 'enterprise': return 'default' as const;
+  }
+};
+
 interface Workspace {
   id: string;
   name: string;
@@ -160,29 +185,6 @@ const WorkspaceManager = () => {
     ));
   };
 
-  const getTypeIcon = (type: Workspace['type']) => {
-    switch (type) {
-      case 'personal': return <User className="h-4 w-4" />;
-      case 'team': return <Users className="h-4 w-4" />;
-      case 'enterprise': return <Building2 className="h-4 w-4" />;
-    }
-  };
-
-  const getPrivacyIcon = (privacy: Workspace['privacy']) => {
-    switch (privacy) {
-      case 'private': return <Lock className="h-4 w-4" />;
-      case 'team': return <Users className="h-4 w-4" />;
-      case 'public': return <Globe className="h-4 w-4" />;
-    }
-  };
-
-  const getTypeBadgeVariant = (type: Workspace['type']) => {
-    switch (type) {
-      case 'personal': return 'outline' as const;
-      case 'team': return 'secondary' as const;
-      case 'enterprise': return 'default' as const;
-    }
-  };
 
   const handleCreateWorkspace = (data: { name: string; description: string; type: Workspace['type'] }) => {
     const newWorkspace: Workspace = {
@@ -205,29 +207,6 @@ const WorkspaceManager = () => {
     toast.success('Workspace created successfully');
   };
 
-  const getTypeIcon = (type: Workspace['type']) => {
-    switch (type) {
-      case 'personal': return <User className="h-4 w-4" />;
-      case 'team': return <Users className="h-4 w-4" />;
-      case 'enterprise': return <Building2 className="h-4 w-4" />;
-    }
-  };
-
-  const getPrivacyIcon = (privacy: Workspace['privacy']) => {
-    switch (privacy) {
-      case 'private': return <Lock className="h-4 w-4" />;
-      case 'team': return <Users className="h-4 w-4" />;
-      case 'public': return <Globe className="h-4 w-4" />;
-    }
-  };
-
-  const getTypeBadgeVariant = (type: Workspace['type']) => {
-    switch (type) {
-      case 'personal': return 'outline' as const;
-      case 'team': return 'secondary' as const;
-      case 'enterprise': return 'default' as const;
-    }
-  };
 
   return (
     <div className="space-y-6">
