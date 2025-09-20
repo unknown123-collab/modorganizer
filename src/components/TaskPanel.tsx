@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import TaskInput from './TaskInput';
-import { CheckCheck, MoreHorizontal, Filter, Inbox } from 'lucide-react';
+import TaskEditDialog from './TaskEditDialog';
+import { CheckCheck, MoreHorizontal, Filter, Inbox, Edit } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,8 @@ import { formatPhilippineTime } from '@/utils/timezone';
 const TaskPanel = () => {
   const { tasks, updateTask, deleteTask, archiveTask, loading } = useSupabaseTasks();
   const [filter, setFilter] = useState<string>('all');
+  const [editingTask, setEditingTask] = useState<any>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   
   const filteredTasks = tasks.filter(task => {
     if (task.archived) return false;
@@ -149,7 +152,17 @@ const TaskPanel = () => {
                   <DropdownMenuTrigger>
                     <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="bg-popover border border-border shadow-lg z-50">
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        setEditingTask(task);
+                        setEditDialogOpen(true);
+                      }} 
+                      className="flex items-center gap-2"
+                    >
+                      <Edit className="h-4 w-4" />
+                      Edit
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => archiveTask(task.id)}>Archive</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => deleteTask(task.id)}>Delete</DropdownMenuItem>
                   </DropdownMenuContent>
@@ -169,6 +182,15 @@ const TaskPanel = () => {
           </div>
         )}
       </div>
+
+      <TaskEditDialog 
+        task={editingTask}
+        open={editDialogOpen}
+        onOpenChange={(open) => {
+          setEditDialogOpen(open);
+          if (!open) setEditingTask(null);
+        }}
+      />
     </div>
   );
 };
