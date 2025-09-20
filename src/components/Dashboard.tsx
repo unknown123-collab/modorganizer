@@ -8,6 +8,7 @@ import ProductivityStatsCard from './ProductivityStatsCard';
 import TasksProgressCard from './TasksProgressCard';
 import GamificationCard from './GamificationCard';
 import TipsCard from './TipsCard';
+import CategoryManager from './CategoryManager';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -125,6 +126,9 @@ const Dashboard = () => {
       
       {/* Task Input */}
       <EnhancedTaskInput />
+      
+      {/* Category Management */}
+      <CategoryManager />
       
       {/* Dashboard Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">

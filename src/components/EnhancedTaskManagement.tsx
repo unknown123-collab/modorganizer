@@ -17,10 +17,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import TaskEditDialog from './TaskEditDialog';
 
 const EnhancedTaskManagement = () => {
   const { tasks, updateTask, deleteTask, archiveTask, loading } = useSupabaseTasks();
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [editingTask, setEditingTask] = useState<any>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
     search: '',
     priority: [],
@@ -349,7 +352,12 @@ const EnhancedTaskManagement = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => {
+                                setEditingTask(task);
+                                setEditDialogOpen(true);
+                              }}
+                            >
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
@@ -385,6 +393,15 @@ const EnhancedTaskManagement = () => {
           )}
         </CardContent>
       </Card>
+      
+      <TaskEditDialog 
+        task={editingTask}
+        open={editDialogOpen}
+        onOpenChange={(open) => {
+          setEditDialogOpen(open);
+          if (!open) setEditingTask(null);
+        }}
+      />
     </div>
   );
 };
