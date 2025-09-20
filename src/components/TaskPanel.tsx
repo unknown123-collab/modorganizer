@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import TaskInput from './TaskInput';
 import TaskEditDialog from './TaskEditDialog';
+import CategoryManager from './CategoryManager';
 import { CheckCheck, MoreHorizontal, Filter, Inbox, Edit } from 'lucide-react';
 import { 
   DropdownMenu,
@@ -76,6 +77,8 @@ const TaskPanel = () => {
       <h1 className="text-3xl font-bold text-foreground">Tasks</h1>
       
       <TaskInput />
+
+      <CategoryManager />
       
       {/* Filters */}
       <div className="flex justify-between items-center">
