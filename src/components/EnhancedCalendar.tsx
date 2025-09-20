@@ -9,7 +9,6 @@ import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval } from '
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { formatPhilippineTime } from '@/utils/timezone';
 
 const EnhancedCalendar = () => {
   const { tasks, timeBlocks, generateSchedule, categories } = useSupabaseTasks();
@@ -367,7 +366,7 @@ const EnhancedCalendar = () => {
                           </Badge>
                         </div>
                         <div className="text-sm text-muted-foreground mb-2">
-                          {formatPhilippineTime(block.start_time, 'h:mm a')} - {formatPhilippineTime(block.end_time, 'h:mm a')}
+                          {format(new Date(block.start_time), 'h:mm a')} - {format(new Date(block.end_time), 'h:mm a')}
                         </div>
                         {task.category_id && (
                           <Badge variant="outline" className="text-xs">
