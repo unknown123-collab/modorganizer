@@ -2,6 +2,7 @@
 import React from 'react';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import { CheckCircle } from 'lucide-react';
+import { formatPhilippineTime } from '@/utils/timezone';
 
 const PriorityTasksCard = () => {
   const { tasks, updateTask } = useSupabaseTasks();
@@ -63,9 +64,9 @@ const PriorityTasksCard = () => {
                 <div>
                   <div className="font-medium">{task.title}</div>
                   {task.deadline && (
-                    <div className="text-xs text-muted-foreground">
-                      Due: {new Date(task.deadline).toLocaleDateString()}
-                    </div>
+                     <div className="text-xs text-muted-foreground">
+                       Due: {formatPhilippineTime(task.deadline, 'PPP')}
+                     </div>
                   )}
                 </div>
               </div>

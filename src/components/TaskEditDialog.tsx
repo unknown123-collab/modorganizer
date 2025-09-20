@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, Save, X, Target, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { useSupabaseTasks, SupabaseTask } from '@/hooks/useSupabaseTasks';
+import { formatPhilippineTime, toPhilippineTime } from '@/utils/timezone';
 
 interface TaskEditDialogProps {
   task: SupabaseTask | null;
@@ -30,14 +31,14 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
 
   useEffect(() => {
     if (task) {
-      setFormData({
-        title: task.title,
-        description: task.description || '',
-        priority: task.priority,
-        timeEstimate: task.time_estimate?.toString() || '',
-        categoryId: task.category_id || '',
-        deadline: task.deadline ? new Date(task.deadline) : undefined
-      });
+    setFormData({
+      title: task.title,
+      description: task.description || '',
+      priority: task.priority,
+      timeEstimate: task.time_estimate?.toString() || '',
+      categoryId: task.category_id || '',
+      deadline: task.deadline ? toPhilippineTime(task.deadline) : undefined
+    });
     }
   }, [task]);
 
@@ -179,7 +180,7 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     <span className="text-sm">
-                      {formData.deadline ? format(formData.deadline, "PPP") : "Pick a date"}
+                      {formData.deadline ? formatPhilippineTime(formData.deadline, "PPP") : "Pick a date"}
                     </span>
                   </Button>
                 </PopoverTrigger>

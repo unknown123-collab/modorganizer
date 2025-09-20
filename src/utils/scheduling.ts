@@ -1,6 +1,7 @@
 
 import { Task, TimeBlock, UserSettings } from '@/types';
 import { prioritizeTasks } from './prioritization';
+import { getPhilippineNow, fromPhilippineTime } from './timezone';
 
 export const createSchedule = (
   tasks: Task[], 
@@ -10,9 +11,8 @@ export const createSchedule = (
   // Get prioritized tasks
   const prioritizedTasks = prioritizeTasks(tasks).filter(t => !t.completed);
   
-  // Current date for scheduling
-  const now = new Date();
-  let currentDate = new Date(now);
+  // Current date for scheduling in Philippine timezone
+  let currentDate = getPhilippineNow();
   currentDate.setHours(parseInt(settings.workHours.start.split(':')[0], 10));
   currentDate.setMinutes(parseInt(settings.workHours.start.split(':')[1], 10));
   
@@ -56,12 +56,15 @@ export const createSchedule = (
       } while (!settings.workDays.includes(currentDate.getDay()));
     }
     
-    // Create the time block
+    // Create the time block (convert to UTC for consistency)
+    const startUTC = fromPhilippineTime(new Date(currentDate));
+    const endUTC = fromPhilippineTime(new Date(currentDate.getTime() + taskDuration * 60000));
+    
     const timeBlock: TimeBlock = {
       id: `block-${Date.now()}-${task.id}`,
       taskId: task.id,
-      start: new Date(currentDate),
-      end: new Date(currentDate.getTime() + taskDuration * 60000), // Convert minutes to milliseconds
+      start: startUTC,
+      end: endUTC,
       completed: false
     };
     

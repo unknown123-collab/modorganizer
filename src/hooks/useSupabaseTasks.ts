@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { getPhilippineNow, fromPhilippineTime, toPhilippineTime } from '@/utils/timezone';
 
 export interface SupabaseTask {
   id: string;
@@ -122,7 +123,7 @@ export const useSupabaseTasks = () => {
         title: taskData.title || '',
         user_id: user.id,
         description: taskData.description,
-        deadline: taskData.deadline,
+        deadline: taskData.deadline ? fromPhilippineTime(new Date(taskData.deadline)).toISOString() : null,
         completed: taskData.completed || false,
         archived: false,
         priority: taskData.priority || 'notUrgent-notImportant',
@@ -287,18 +288,16 @@ export const useSupabaseTasks = () => {
         return;
       }
 
-      // Determine starting date and time
-      let currentTime = new Date();
+      // Determine starting date and time in Philippine timezone
+      let currentTime = getPhilippineNow();
       
       if (specificDate) {
         // If specific date is provided, start scheduling from that date
-        currentTime = new Date(specificDate);
-        currentTime.setHours(9, 0, 0, 0); // Start at 9 AM on the specific date
+        const philDate = toPhilippineTime(specificDate);
+        currentTime = new Date(philDate);
+        currentTime.setHours(9, 0, 0, 0); // Start at 9 AM Philippine time
       } else {
         // Default behavior - start from now or next available time
-        const now = new Date();
-        currentTime = new Date(now);
-        
         // If it's past 5 PM or weekend, move to next work day at 9 AM
         if (currentTime.getHours() >= 17 || currentTime.getDay() === 0 || currentTime.getDay() === 6) {
           currentTime.setDate(currentTime.getDate() + 1);
@@ -387,10 +386,14 @@ export const useSupabaseTasks = () => {
           }
         }
         
+        // Convert Philippine time to UTC for storage
+        const startTimeUTC = fromPhilippineTime(new Date(currentTime));
+        const endTimeUTC = fromPhilippineTime(new Date(currentTime.getTime() + duration * 60 * 1000));
+        
         scheduleBlocks.push({
           task_id: task.id,
-          start_time: new Date(currentTime).toISOString(),
-          end_time: new Date(currentTime.getTime() + duration * 60 * 1000).toISOString(),
+          start_time: startTimeUTC.toISOString(),
+          end_time: endTimeUTC.toISOString(),
           user_id: user.id,
           completed: false
         });

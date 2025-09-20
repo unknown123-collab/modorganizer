@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, Plus, Sparkles, Clock, Target } from 'lucide-react';
 import { format } from 'date-fns';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
+import { formatPhilippineTime } from '@/utils/timezone';
 
 const EnhancedTaskInput = () => {
   const { addTask, categories } = useSupabaseTasks();
@@ -209,7 +210,7 @@ const EnhancedTaskInput = () => {
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     <span className="text-sm">
-                      {formData.deadline ? format(formData.deadline, "PPP") : "Pick a date"}
+                      {formData.deadline ? formatPhilippineTime(formData.deadline, "PPP") : "Pick a date"}
                     </span>
                   </Button>
                 </PopoverTrigger>

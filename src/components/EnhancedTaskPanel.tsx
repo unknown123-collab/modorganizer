@@ -10,6 +10,7 @@ import { CheckSquare, Clock, Calendar, Search, Filter, Trash2, Edit, Target } fr
 import { useSupabaseTasks, SupabaseTask } from '@/hooks/useSupabaseTasks';
 import { format, isToday, isTomorrow, isPast } from 'date-fns';
 import TaskEditDialog from './TaskEditDialog';
+import { formatPhilippineTime, toPhilippineTime } from '@/utils/timezone';
 
 const EnhancedTaskPanel = () => {
   const { tasks, categories, updateTask, deleteTask, archiveTask, loading } = useSupabaseTasks();
@@ -66,7 +67,7 @@ const EnhancedTaskPanel = () => {
   const getDeadlineStatus = (deadline?: string) => {
     if (!deadline) return null;
     
-    const deadlineDate = new Date(deadline);
+    const deadlineDate = toPhilippineTime(deadline);
     
     if (isPast(deadlineDate) && !isToday(deadlineDate)) {
       return { label: 'Overdue', variant: 'destructive' as const };

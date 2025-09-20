@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatPhilippineTime } from '@/utils/timezone';
 
 const TaskPanel = () => {
   const { tasks, updateTask, deleteTask, archiveTask, loading } = useSupabaseTasks();
@@ -131,7 +132,7 @@ const TaskPanel = () => {
                       
                       {task.deadline && (
                         <div className="text-xs text-muted-foreground">
-                          Due: {new Date(task.deadline).toLocaleDateString()}
+                          Due: {formatPhilippineTime(task.deadline, 'PPP')}
                         </div>
                       )}
                       

@@ -10,6 +10,7 @@ import {
   CheckCheck, MoreHorizontal, Calendar, Clock, 
   Target, Tag, Edit, Archive, Trash2 
 } from 'lucide-react';
+import { formatPhilippineTime } from '@/utils/timezone';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -311,7 +312,7 @@ const EnhancedTaskManagement = () => {
                                 className="flex items-center gap-1"
                               >
                                 <Calendar className="h-3 w-3" />
-                                {new Date(task.deadline).toLocaleDateString()}
+                                {formatPhilippineTime(task.deadline, 'PPP')}
                               </Badge>
                             )}
 
