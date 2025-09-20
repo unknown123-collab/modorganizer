@@ -140,6 +140,7 @@ export type Database = {
           created_at: string | null
           deadline: string | null
           description: string | null
+          hobby: string | null
           id: string
           priority: string | null
           tags: string[] | null
@@ -156,6 +157,7 @@ export type Database = {
           created_at?: string | null
           deadline?: string | null
           description?: string | null
+          hobby?: string | null
           id?: string
           priority?: string | null
           tags?: string[] | null
@@ -172,6 +174,7 @@ export type Database = {
           created_at?: string | null
           deadline?: string | null
           description?: string | null
+          hobby?: string | null
           id?: string
           priority?: string | null
           tags?: string[] | null

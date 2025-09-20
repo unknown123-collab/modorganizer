@@ -23,6 +23,7 @@ const EnhancedTaskInput = () => {
     priority: 'notUrgent-notImportant' as const,
     timeEstimate: '',
     categoryId: '',
+    hobby: '',
     deadline: undefined as Date | undefined
   });
 
@@ -36,6 +37,7 @@ const EnhancedTaskInput = () => {
       priority: formData.priority,
       time_estimate: formData.timeEstimate ? parseInt(formData.timeEstimate) : undefined,
       category_id: formData.categoryId || undefined,
+      hobby: formData.hobby || undefined,
       deadline: formData.deadline?.toISOString(),
       completed: false,
       tags: []
@@ -48,6 +50,7 @@ const EnhancedTaskInput = () => {
       priority: 'notUrgent-notImportant',
       timeEstimate: '',
       categoryId: '',
+      hobby: '',
       deadline: undefined
     });
     setIsOpen(false);
@@ -224,6 +227,18 @@ const EnhancedTaskInput = () => {
                 </PopoverContent>
               </Popover>
             </div>
+          </div>
+
+          {/* Hobby Field */}
+          <div className="space-y-2">
+            <Label htmlFor="hobby">Hobby (Optional)</Label>
+            <Input
+              id="hobby"
+              placeholder="e.g., Reading, Gaming, Cooking, Sports..."
+              value={formData.hobby}
+              onChange={(e) => setFormData(prev => ({ ...prev, hobby: e.target.value }))}
+              className="h-10"
+            />
           </div>
 
           {/* Action Buttons */}

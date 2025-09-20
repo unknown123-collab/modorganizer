@@ -16,6 +16,7 @@ export interface SupabaseTask {
   category_id?: string;
   time_estimate?: number;
   tags?: string[];
+  hobby?: string;
   created_at: string;
   updated_at: string;
   user_id: string;
