@@ -26,7 +26,6 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
     priority: 'notUrgent-notImportant' as SupabaseTask['priority'],
     timeEstimate: '',
     categoryId: '',
-    hobby: '',
     deadline: undefined as Date | undefined
   });
 
@@ -38,7 +37,6 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
       priority: task.priority,
       timeEstimate: task.time_estimate?.toString() || '',
       categoryId: task.category_id || '',
-      hobby: task.hobby || '',
       deadline: task.deadline ? toPhilippineTime(task.deadline) : undefined
     });
     }
@@ -54,7 +52,6 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
       priority: formData.priority,
       time_estimate: formData.timeEstimate ? parseInt(formData.timeEstimate) : undefined,
       category_id: formData.categoryId || undefined,
-      hobby: formData.hobby || undefined,
       deadline: formData.deadline?.toISOString()
     });
 
@@ -197,18 +194,6 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
                 </PopoverContent>
               </Popover>
             </div>
-          </div>
-
-          {/* Hobby Field */}
-          <div className="space-y-2">
-            <Label htmlFor="edit-hobby">Hobby (Optional)</Label>
-            <Input
-              id="edit-hobby"
-              placeholder="e.g., Reading, Gaming, Cooking, Sports..."
-              value={formData.hobby}
-              onChange={(e) => setFormData(prev => ({ ...prev, hobby: e.target.value }))}
-              className="h-10"
-            />
           </div>
 
           {/* Action Buttons */}

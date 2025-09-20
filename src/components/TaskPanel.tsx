@@ -11,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatPhilippineTime } from '@/utils/timezone';
 
@@ -131,14 +130,6 @@ const TaskPanel = () => {
                     <div className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
                       {task.title}
                     </div>
-                    
-                    {task.hobby && (
-                      <div className="mt-1">
-                        <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
-                          🎯 {task.hobby}
-                        </Badge>
-                      </div>
-                    )}
                     
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       <div className={`px-2 py-0.5 rounded-full text-xs ${getPriorityColor(task.priority)} text-white`}>
