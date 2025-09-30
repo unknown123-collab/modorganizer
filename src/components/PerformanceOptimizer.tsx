@@ -19,7 +19,6 @@ interface PerformanceMetrics {
   tasksPerformance: number;
   memoryUsage: number;
   renderCount: number;
-  cacheHitRate: number;
 }
 
 const PerformanceOptimizer: React.FC = memo(() => {
@@ -49,8 +48,7 @@ const PerformanceOptimizer: React.FC = memo(() => {
       loadTime: endTime - startTime,
       tasksPerformance: Math.round(tasksPerformance),
       memoryUsage: Math.round(memoryUsage),
-      renderCount: Math.floor(Math.random() * 10) + 1,
-      cacheHitRate: Math.floor(Math.random() * 20) + 80
+      renderCount: Math.floor(Math.random() * 10) + 1
     };
   }, [tasks, timeBlocks]);
 
@@ -76,14 +74,6 @@ const PerformanceOptimizer: React.FC = memo(() => {
       });
     }
     
-    if (metrics.cacheHitRate < 90) {
-      suggestions.push({
-        type: 'warning',
-        title: 'Low Cache Efficiency',
-        description: 'Consider enabling browser caching for better performance',
-        action: 'Enable Caching'
-      });
-    }
     
     if (suggestions.length === 0) {
       suggestions.push({
@@ -151,7 +141,7 @@ const PerformanceOptimizer: React.FC = memo(() => {
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Performance Metrics */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -196,22 +186,6 @@ const PerformanceOptimizer: React.FC = memo(() => {
             </div>
             <Progress 
               value={metrics.memoryUsage} 
-              className="h-2"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {getMetricIcon('cacheHitRate')}
-                <span className="text-sm font-medium">Cache Hit Rate</span>
-              </div>
-              <span className="text-sm text-muted-foreground">
-                {metrics.cacheHitRate}%
-              </span>
-            </div>
-            <Progress 
-              value={metrics.cacheHitRate} 
               className="h-2"
             />
           </div>

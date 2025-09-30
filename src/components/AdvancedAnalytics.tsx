@@ -36,7 +36,6 @@ import {
 } from 'lucide-react';
 import { RealTimeAnalytics } from './RealTimeAnalytics';
 import { PerformanceOptimizer } from './PerformanceOptimizer';
-import { EnhancedTimeTracking } from './EnhancedTimeTracking';
 
 const AdvancedAnalytics = () => {
   const { tasks, timeBlocks } = useSupabaseTasks();
@@ -217,9 +216,6 @@ const AdvancedAnalytics = () => {
         </Card>
       </div>
 
-      {/* Enhanced Time Tracking */}
-      <EnhancedTimeTracking />
-      
       {/* Performance Optimizer */}
       <PerformanceOptimizer />
       
