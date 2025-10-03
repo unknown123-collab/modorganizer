@@ -185,7 +185,8 @@ export const TimeTracking: React.FC = () => {
       .reduce((total, block) => {
         const start = new Date(block.start_time).getTime();
         const end = new Date(block.end_time).getTime();
-        return total + (end - start) / 1000; // seconds
+        const duration = (end - start) / 1000; // seconds
+        return total + Math.max(0, duration); // Ensure no negative values
       }, 0);
   };
 
@@ -210,32 +211,38 @@ export const TimeTracking: React.FC = () => {
       <CardContent className="space-y-4">
         {/* Active Timer */}
         {activeBlock ? (
-          <div className="p-4 bg-primary/10 border-2 border-primary rounded-lg space-y-3">
+          <div className="p-6 bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/50 rounded-xl space-y-4 shadow-lg">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Currently tracking</p>
-                <p className="font-semibold">{activeBlock.tasks.title}</p>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Currently tracking</p>
+                <p className="text-lg font-bold text-foreground">{activeBlock.tasks.title}</p>
               </div>
-              <Badge variant="default" className="animate-pulse">
-                Active
+              <Badge variant="default" className="animate-pulse shadow-lg">
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 bg-white rounded-full animate-ping"></span>
+                  Active
+                </span>
               </Badge>
             </div>
-            <div className="text-3xl font-mono font-bold text-center">
-              {formatTime(elapsedTime)}
+            <div className="bg-background/80 backdrop-blur-sm rounded-lg p-4">
+              <div className="text-4xl font-mono font-bold text-center text-primary tracking-wider">
+                {formatTime(elapsedTime)}
+              </div>
+              <p className="text-xs text-center text-muted-foreground mt-2">Elapsed Time</p>
             </div>
-            <Button onClick={stopTracking} variant="destructive" className="w-full" size="sm">
-              <Square className="h-4 w-4 mr-2" />
+            <Button onClick={stopTracking} variant="destructive" className="w-full shadow-md" size="lg">
+              <Square className="h-5 w-5 mr-2" />
               Stop Tracking
             </Button>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Select Task</label>
+              <label className="text-sm font-medium mb-2 block">Select Task to Track</label>
               <select
                 value={selectedTaskId}
                 onChange={(e) => setSelectedTaskId(e.target.value)}
-                className="w-full p-2 border rounded-md bg-background"
+                className="w-full p-3 border-2 rounded-lg bg-background hover:border-primary/50 transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
               >
                 <option value="">Choose a task...</option>
                 {tasks.map((task) => (
@@ -248,45 +255,52 @@ export const TimeTracking: React.FC = () => {
             <Button
               onClick={startTracking}
               disabled={!selectedTaskId}
-              className="w-full"
-              size="sm"
+              className="w-full shadow-md"
+              size="lg"
             >
-              <Play className="h-4 w-4 mr-2" />
+              <Play className="h-5 w-5 mr-2" />
               Start Tracking
             </Button>
           </div>
         )}
 
         {/* Today's Summary */}
-        <div className="pt-4 border-t">
-          <div className="flex items-center justify-between mb-3">
+        <div className="pt-4 border-t border-border/50">
+          <div className="flex items-center justify-between mb-4 p-3 bg-accent/30 rounded-lg">
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Today's Total</span>
+              <Clock className="h-5 w-5 text-primary" />
+              <span className="text-sm font-semibold">Today's Total Focus</span>
             </div>
-            <span className="text-lg font-bold">{formatTime(getTotalTimeToday())}</span>
+            <span className="text-xl font-bold text-primary">{formatTime(getTotalTimeToday())}</span>
           </div>
 
           {/* Recent Sessions */}
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground">Recent Sessions</p>
-            {timeBlocks.slice(0, 3).map((block) => {
-              const duration = Math.floor(
-                (new Date(block.end_time).getTime() - new Date(block.start_time).getTime()) / 1000
-              );
-              return (
-                <div
-                  key={block.id}
-                  className="flex items-center justify-between p-2 bg-muted/50 rounded text-xs"
-                >
-                  <span className="truncate flex-1">{block.tasks.title}</span>
-                  <span className="font-mono ml-2">{formatTime(duration)}</span>
-                </div>
-              );
-            })}
-            {timeBlocks.length === 0 && (
-              <p className="text-xs text-muted-foreground text-center py-2">
-                No sessions today
+            {timeBlocks
+              .filter((block) => block.completed) // Only show completed sessions
+              .slice(0, 3)
+              .map((block) => {
+                const duration = Math.floor(
+                  (new Date(block.end_time).getTime() - new Date(block.start_time).getTime()) / 1000
+                );
+                return (
+                  <div
+                    key={block.id}
+                    className="flex items-center justify-between p-2 bg-accent/50 rounded text-xs hover:bg-accent/70 transition-colors"
+                  >
+                    <span className="truncate flex-1">{block.tasks.title}</span>
+                    <div className="flex items-center gap-2 ml-2">
+                      <Badge variant="outline" className="font-mono text-xs">
+                        {formatTime(Math.max(0, duration))}
+                      </Badge>
+                    </div>
+                  </div>
+                );
+              })}
+            {timeBlocks.filter((block) => block.completed).length === 0 && (
+              <p className="text-xs text-muted-foreground text-center py-4">
+                No completed sessions yet today
               </p>
             )}
           </div>

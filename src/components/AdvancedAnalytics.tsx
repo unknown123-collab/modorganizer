@@ -84,16 +84,20 @@ const AdvancedAnalytics = () => {
         isWithinInterval(new Date(block.start_time), { start: dayStart, end: dayEnd })
       );
 
+      // Only count completed blocks for total
       const totalMinutes = dayBlocks.reduce((total, block) => {
+        if (!block.completed) return total;
         const start = new Date(block.start_time);
         const end = new Date(block.end_time);
-        return total + (end.getTime() - start.getTime()) / (1000 * 60);
+        const duration = (end.getTime() - start.getTime()) / (1000 * 60);
+        return total + Math.max(0, duration); // Ensure no negative values
       }, 0);
 
       const completedMinutes = dayBlocks.filter(b => b.completed).reduce((total, block) => {
         const start = new Date(block.start_time);
         const end = new Date(block.end_time);
-        return total + (end.getTime() - start.getTime()) / (1000 * 60);
+        const duration = (end.getTime() - start.getTime()) / (1000 * 60);
+        return total + Math.max(0, duration); // Ensure no negative values
       }, 0);
 
       return {
@@ -153,9 +157,12 @@ const AdvancedAnalytics = () => {
         overdueTasks,
         upcomingDeadlines,
         totalFocusTime: Math.round(timeBlocks.reduce((total, block) => {
+          // Only count completed blocks
+          if (!block.completed) return total;
           const start = new Date(block.start_time);
           const end = new Date(block.end_time);
-          return total + (end.getTime() - start.getTime()) / (1000 * 60);
+          const duration = (end.getTime() - start.getTime()) / (1000 * 60);
+          return total + Math.max(0, duration); // Ensure no negative values
         }, 0) / 60)
       }
     };

@@ -18,10 +18,13 @@ export const RealTimeAnalytics: React.FC = () => {
     // Calculate initial stats
     const completedTasks = tasks.filter(task => task.completed).length;
     const activeBlocks = timeBlocks.filter(block => !block.completed).length;
-    const totalTime = timeBlocks.reduce((sum, block) => {
-      const duration = new Date(block.end_time).getTime() - new Date(block.start_time).getTime();
-      return sum + (duration / (1000 * 60)); // Convert to minutes
-    }, 0);
+    // Only count completed blocks for total focus time
+    const totalTime = timeBlocks
+      .filter(block => block.completed)
+      .reduce((sum, block) => {
+        const duration = new Date(block.end_time).getTime() - new Date(block.start_time).getTime();
+        return sum + Math.max(0, duration / (1000 * 60)); // Convert to minutes, ensure no negative values
+      }, 0);
     const rate = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0;
 
     setLiveStats({
