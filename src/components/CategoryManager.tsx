@@ -7,7 +7,7 @@ import { Plus, Tag, Trash2 } from 'lucide-react';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 
 const CategoryManager = () => {
-  const { categories, addCategory, loading } = useSupabaseTasks();
+  const { categories, addCategory, deleteCategory, loading } = useSupabaseTasks();
   const [newCategoryName, setNewCategoryName] = useState('');
   const [selectedColor, setSelectedColor] = useState('#3B82F6');
 
@@ -45,6 +45,12 @@ const CategoryManager = () => {
     }
   };
 
+  const handleDeleteCategory = async (id: string) => {
+    if (deleteCategory) {
+      await deleteCategory(id);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -76,7 +82,7 @@ const CategoryManager = () => {
               <Badge
                 key={category.id}
                 variant="secondary"
-                className="px-3 py-1"
+                className="px-3 py-1.5 flex items-center gap-2 group"
                 style={{ 
                   backgroundColor: `${category.color}20`,
                   borderColor: category.color,
@@ -84,10 +90,17 @@ const CategoryManager = () => {
                 }}
               >
                 <div 
-                  className="w-2 h-2 rounded-full mr-2" 
+                  className="w-2 h-2 rounded-full" 
                   style={{ backgroundColor: category.color }}
                 />
-                {category.name}
+                <span>{category.name}</span>
+                <button
+                  onClick={() => handleDeleteCategory(category.id)}
+                  className="ml-1 hover:opacity-70 transition-opacity"
+                  aria-label="Delete category"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </button>
               </Badge>
             ))}
           </div>

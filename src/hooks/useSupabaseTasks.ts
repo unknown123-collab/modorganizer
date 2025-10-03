@@ -272,6 +272,34 @@ export const useSupabaseTasks = () => {
     }
   };
 
+  // Delete category
+  const deleteCategory = async (id: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      
+      setCategories(prev => prev.filter(category => category.id !== id));
+      toast({
+        title: "Category deleted",
+        description: "Your category has been deleted successfully"
+      });
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      toast({
+        title: "Error deleting category",
+        description: "Please try again later",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Generate schedule
   const generateSchedule = async (specificDate?: Date) => {
     if (!user) return;
@@ -448,6 +476,7 @@ export const useSupabaseTasks = () => {
     updateTask,
     deleteTask,
     addCategory,
+    deleteCategory,
     generateSchedule,
     refetch: () => {
       fetchTasks();
