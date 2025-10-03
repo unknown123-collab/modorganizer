@@ -11,7 +11,6 @@ import { CalendarIcon, Save, X, Target, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { useSupabaseTasks, SupabaseTask } from '@/hooks/useSupabaseTasks';
 import { formatPhilippineTime, toPhilippineTime } from '@/utils/timezone';
-import { TagsInput } from '@/components/ui/tags-input';
 
 interface TaskEditDialogProps {
   task: SupabaseTask | null;
@@ -27,8 +26,7 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
     priority: 'notUrgent-notImportant' as SupabaseTask['priority'],
     timeEstimate: '',
     categoryId: '',
-    deadline: undefined as Date | undefined,
-    tags: [] as string[]
+    deadline: undefined as Date | undefined
   });
 
   useEffect(() => {
@@ -39,8 +37,7 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
       priority: task.priority,
       timeEstimate: task.time_estimate?.toString() || '',
       categoryId: task.category_id || '',
-      deadline: task.deadline ? toPhilippineTime(task.deadline) : undefined,
-      tags: task.tags || []
+      deadline: task.deadline ? toPhilippineTime(task.deadline) : undefined
     });
     }
   }, [task]);
@@ -55,8 +52,7 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
       priority: formData.priority,
       time_estimate: formData.timeEstimate ? parseInt(formData.timeEstimate) : undefined,
       category_id: formData.categoryId || undefined,
-      deadline: formData.deadline?.toISOString(),
-      tags: formData.tags
+      deadline: formData.deadline?.toISOString()
     });
 
     onOpenChange(false);
@@ -198,16 +194,6 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
                 </PopoverContent>
               </Popover>
             </div>
-          </div>
-
-          {/* Tags */}
-          <div className="space-y-2">
-            <Label className="text-sm">Tags</Label>
-            <TagsInput
-              tags={formData.tags}
-              onChange={(tags) => setFormData(prev => ({ ...prev, tags }))}
-              placeholder="Add tags like 'meeting', 'planning', 'cleanup'..."
-            />
           </div>
 
           {/* Action Buttons */}
