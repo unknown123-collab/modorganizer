@@ -218,9 +218,11 @@ const AdvancedAnalytics = () => {
         </Card>
       </div>
 
-      {/* Performance Monitor with Time Tracking and Task Progress */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <PerformanceOptimizer />
+      {/* Performance Optimizer */}
+      <PerformanceOptimizer />
+      
+      {/* Time Tracking and Task Progress */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TimeTracking />
         <TaskProgress />
       </div>
