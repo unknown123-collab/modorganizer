@@ -9,6 +9,7 @@ import TasksProgressCard from './TasksProgressCard';
 import GamificationCard from './GamificationCard';
 import TipsCard from './TipsCard';
 import CategoryManager from './CategoryManager';
+import { NotificationSystem } from './NotificationSystem';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +33,9 @@ const Dashboard = () => {
   
   return (
     <div className="space-y-6">
+      {/* Notification System - runs in background to show toast notifications */}
+      <NotificationSystem />
+      
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
