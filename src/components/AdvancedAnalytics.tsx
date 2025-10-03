@@ -36,6 +36,8 @@ import {
 } from 'lucide-react';
 import { RealTimeAnalytics } from './RealTimeAnalytics';
 import { PerformanceOptimizer } from './PerformanceOptimizer';
+import { TimeTracking } from './TimeTracking';
+import { TaskProgress } from './TaskProgress';
 
 const AdvancedAnalytics = () => {
   const { tasks, timeBlocks } = useSupabaseTasks();
@@ -216,8 +218,12 @@ const AdvancedAnalytics = () => {
         </Card>
       </div>
 
-      {/* Performance Optimizer */}
-      <PerformanceOptimizer />
+      {/* Performance Monitor with Time Tracking and Task Progress */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <PerformanceOptimizer />
+        <TimeTracking />
+        <TaskProgress />
+      </div>
       
       {/* Charts */}
       <Tabs defaultValue="trends" className="space-y-4">

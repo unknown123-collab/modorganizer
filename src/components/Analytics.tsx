@@ -8,8 +8,6 @@ import SmartTaskSuggestions from '@/components/SmartTaskSuggestions';
 import RewardSystem from '@/components/RewardSystem';
 import AdvancedAnalytics from '@/components/AdvancedAnalytics';
 import { NotificationSystem } from '@/components/NotificationSystem';
-import { TimeTracking } from '@/components/TimeTracking';
-import { TaskProgress } from '@/components/TaskProgress';
 import { BarChart3, Trophy, TrendingUp, Brain, Sparkles } from 'lucide-react';
 
 const Analytics = () => {
@@ -45,10 +43,6 @@ const Analytics = () => {
         </TabsList>
         
         <TabsContent value="advanced" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <TimeTracking />
-            <TaskProgress />
-          </div>
           <AdvancedAnalytics />
         </TabsContent>
         
