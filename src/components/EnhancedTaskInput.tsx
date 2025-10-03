@@ -13,6 +13,7 @@ import { CalendarIcon, Plus, Sparkles, Clock, Target } from 'lucide-react';
 import { format } from 'date-fns';
 import { useSupabaseTasks } from '@/hooks/useSupabaseTasks';
 import { formatPhilippineTime } from '@/utils/timezone';
+import { TagsInput } from '@/components/ui/tags-input';
 
 const EnhancedTaskInput = () => {
   const { addTask, categories } = useSupabaseTasks();
@@ -23,7 +24,8 @@ const EnhancedTaskInput = () => {
     priority: 'notUrgent-notImportant' as const,
     timeEstimate: '',
     categoryId: '',
-    deadline: undefined as Date | undefined
+    deadline: undefined as Date | undefined,
+    tags: [] as string[]
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,7 +40,7 @@ const EnhancedTaskInput = () => {
       category_id: formData.categoryId || undefined,
       deadline: formData.deadline?.toISOString(),
       completed: false,
-      tags: []
+      tags: formData.tags
     });
 
     // Reset form
@@ -48,7 +50,8 @@ const EnhancedTaskInput = () => {
       priority: 'notUrgent-notImportant',
       timeEstimate: '',
       categoryId: '',
-      deadline: undefined
+      deadline: undefined,
+      tags: []
     });
     setIsOpen(false);
   };
@@ -224,6 +227,16 @@ const EnhancedTaskInput = () => {
                 </PopoverContent>
               </Popover>
             </div>
+          </div>
+
+          {/* Tags */}
+          <div className="space-y-2">
+            <Label className="text-sm">Tags</Label>
+            <TagsInput
+              tags={formData.tags}
+              onChange={(tags) => setFormData(prev => ({ ...prev, tags }))}
+              placeholder="Add tags like 'meeting', 'planning', 'cleanup'..."
+            />
           </div>
 
           {/* Action Buttons */}

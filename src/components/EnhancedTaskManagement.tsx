@@ -20,7 +20,7 @@ import {
 import TaskEditDialog from './TaskEditDialog';
 
 const EnhancedTaskManagement = () => {
-  const { tasks, updateTask, deleteTask, archiveTask, loading } = useSupabaseTasks();
+  const { tasks, categories, updateTask, deleteTask, archiveTask, loading } = useSupabaseTasks();
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [editingTask, setEditingTask] = useState<any>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -308,6 +308,27 @@ const EnhancedTaskManagement = () => {
                               {getPriorityLabel(task.priority)}
                             </Badge>
 
+                            {/* Category Badge */}
+                            {task.category_id && (() => {
+                              const category = categories.find(c => c.id === task.category_id);
+                              return category ? (
+                                <Badge 
+                                  variant="outline" 
+                                  className="flex items-center gap-1 border-2"
+                                  style={{ 
+                                    borderColor: category.color,
+                                    color: category.color
+                                  }}
+                                >
+                                  <div 
+                                    className="w-2 h-2 rounded-full" 
+                                    style={{ backgroundColor: category.color }}
+                                  />
+                                  {category.name}
+                                </Badge>
+                              ) : null;
+                            })()}
+
                             {/* Deadline */}
                             {task.deadline && (
                               <Badge 
@@ -328,7 +349,7 @@ const EnhancedTaskManagement = () => {
                             )}
 
                             {/* Tags */}
-                            {task.tags && task.tags.map(tag => (
+                            {task.tags && task.tags.length > 0 && task.tags.map(tag => (
                               <Badge key={tag} variant="outline" className="flex items-center gap-1">
                                 <Tag className="h-3 w-3" />
                                 {tag}
