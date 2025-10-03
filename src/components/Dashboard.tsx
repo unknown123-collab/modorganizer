@@ -10,8 +10,6 @@ import GamificationCard from './GamificationCard';
 import TipsCard from './TipsCard';
 import CategoryManager from './CategoryManager';
 import { NotificationSystem } from './NotificationSystem';
-import { TimeTracking } from './TimeTracking';
-import { TaskProgress } from './TaskProgress';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -135,12 +133,6 @@ const Dashboard = () => {
       
       {/* Category Management */}
       <CategoryManager />
-      
-      {/* Time Tracking and Progress */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <TimeTracking />
-        <TaskProgress />
-      </div>
 
       {/* Dashboard Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
