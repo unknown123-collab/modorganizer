@@ -36,70 +36,73 @@ const Dashboard = () => {
       {/* Notification System - runs in background to show toast notifications */}
       <NotificationSystem />
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <LayoutGrid className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+      {/* Header with Stats */}
+      <div className="flex flex-col gap-4 mb-6">
+        {/* Top Row: Dashboard Title and Buttons */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <LayoutGrid className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard</h1>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Welcome back, {user?.user_metadata?.full_name || user?.email}
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
-              Welcome back, {user?.user_metadata?.full_name || user?.email}
-            </p>
+          
+          <div className="flex flex-row items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => window.location.href = '/settings'}
+              className="flex items-center gap-2 justify-center min-h-[40px]"
+            >
+              <User className="h-4 w-4" />
+              <span>Profile</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={signOut}
+              className="flex items-center gap-2 justify-center text-muted-foreground hover:text-destructive min-h-[40px]"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Sign Out</span>
+            </Button>
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => window.location.href = '/settings'}
-            className="flex items-center gap-2 justify-center min-h-[40px]"
-          >
-            <User className="h-4 w-4" />
-            <span className="hidden sm:inline">Profile</span>
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={signOut}
-            className="flex items-center gap-2 justify-center text-muted-foreground hover:text-destructive min-h-[40px]"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Sign Out</span>
-          </Button>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <Card className="bg-primary text-primary-foreground border-0 shadow-lg hover:shadow-xl transition-shadow">
+            <CardContent className="p-4">
+              <div className="text-2xl sm:text-3xl font-bold">{tasks.length}</div>
+              <div className="text-sm opacity-90">Total Tasks</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-accent text-accent-foreground border-0 shadow-lg hover:shadow-xl transition-shadow">
+            <CardContent className="p-4">
+              <div className="text-2xl sm:text-3xl font-bold">{tasks.filter(t => t.completed).length}</div>
+              <div className="text-sm opacity-90">Completed</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 shadow-lg hover:shadow-xl transition-shadow">
+            <CardContent className="p-4">
+              <div className="text-2xl sm:text-3xl font-bold">{tasks.filter(t => !t.completed).length}</div>
+              <div className="text-sm opacity-90">Pending</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-secondary text-secondary-foreground border-0 shadow-lg hover:shadow-xl transition-shadow">
+            <CardContent className="p-4">
+              <div className="text-2xl sm:text-3xl font-bold">
+                {tasks.length > 0 ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100) : 0}%
+              </div>
+              <div className="text-sm opacity-90">Completion Rate</div>
+            </CardContent>
+          </Card>
         </div>
-      </div>
-      
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
-          <CardContent className="p-3 sm:p-4">
-            <div className="text-xl sm:text-2xl font-bold">{tasks.length}</div>
-            <div className="text-xs sm:text-sm opacity-90">Total Tasks</div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white dark:from-emerald-600 dark:to-emerald-700">
-          <CardContent className="p-3 sm:p-4">
-            <div className="text-xl sm:text-2xl font-bold">{tasks.filter(t => t.completed).length}</div>
-            <div className="text-xs sm:text-sm opacity-90">Completed</div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-r from-amber-500 to-amber-600 text-white dark:from-amber-600 dark:to-amber-700">
-          <CardContent className="p-3 sm:p-4">
-            <div className="text-xl sm:text-2xl font-bold">{tasks.filter(t => !t.completed).length}</div>
-            <div className="text-xs sm:text-sm opacity-90">Pending</div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-r from-violet-500 to-violet-600 text-white dark:from-violet-600 dark:to-violet-700">
-          <CardContent className="p-3 sm:p-4">
-            <div className="text-xl sm:text-2xl font-bold">
-              {tasks.length > 0 ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100) : 0}%
-            </div>
-            <div className="text-xs sm:text-sm opacity-90">Completion Rate</div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Recent Achievements */}
