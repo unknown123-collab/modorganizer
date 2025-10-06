@@ -45,12 +45,15 @@ const RewardSystem = () => {
       }
     }
 
-    // Calculate time focused
+    // Calculate time focused (hours, clamped)
     const timeSpent = timeBlocks
       .filter(block => block.completed)
       .reduce((total, block) => {
-        const duration = (new Date(block.end_time).getTime() - new Date(block.start_time).getTime()) / (1000 * 60 * 60);
-        return total + duration;
+        const start = new Date(block.start_time);
+        const end = new Date(block.end_time);
+        const durationHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+        const safe = Number.isFinite(durationHours) ? Math.max(0, durationHours) : 0;
+        return total + safe;
       }, 0);
 
     // Calculate completion rate

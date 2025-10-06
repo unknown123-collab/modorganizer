@@ -50,12 +50,15 @@ const ProductivityAnalytics = () => {
       }
     }
 
-    // Calculate time spent
-    const timeSpent = timeBlocks
+    // Calculate time spent (clamped to avoid negative/invalid durations)
+    const timeSpentMinutes = timeBlocks
       .filter(block => block.completed)
       .reduce((total, block) => {
-        const duration = (new Date(block.end_time).getTime() - new Date(block.start_time).getTime()) / (1000 * 60);
-        return total + duration;
+        const start = new Date(block.start_time);
+        const end = new Date(block.end_time);
+        const duration = (end.getTime() - start.getTime()) / (1000 * 60);
+        const safe = Number.isFinite(duration) ? Math.max(0, duration) : 0;
+        return total + safe;
       }, 0);
 
     // Priority distribution
@@ -94,7 +97,7 @@ const ProductivityAnalytics = () => {
       completionRate,
       recentCompletionRate,
       streak,
-      timeSpent: Math.round(timeSpent / 60), // Convert to hours
+      timeSpent: Math.round(timeSpentMinutes / 60), // Convert to hours
       priorityDistribution,
       weeklyTrend
     };
