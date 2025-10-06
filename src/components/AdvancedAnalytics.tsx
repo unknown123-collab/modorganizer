@@ -40,7 +40,7 @@ import { TimeTracking } from './TimeTracking';
 import { TaskProgress } from './TaskProgress';
 
 const AdvancedAnalytics = () => {
-  const { tasks, timeBlocks } = useSupabaseTasks();
+  const { tasks, timeBlocks, categories } = useSupabaseTasks();
 
   const analytics = useMemo(() => {
     const now = new Date();
@@ -109,21 +109,21 @@ const AdvancedAnalytics = () => {
     });
 
     // Task completion rate by category
-    const categories = [...new Set(tasks.map(t => {
-        const categoryId = t.category_id;
-        return categoryId ? categoryId : null;
-      }).filter(Boolean))];
-    const categoryData = categories.map(categoryId => {
+    const categoryMap = new Map(categories.map(cat => [cat.id, cat.name]));
+    const uniqueCategoryIds = [...new Set(tasks.map(t => t.category_id).filter(Boolean))];
+    
+    const categoryData = uniqueCategoryIds.map(categoryId => {
       const categoryTasks = tasks.filter(t => t.category_id === categoryId);
       const completed = categoryTasks.filter(t => t.completed).length;
+      const categoryName = categoryMap.get(categoryId) || 'Uncategorized';
       
       return {
-        category: `Category ${String(categoryId).slice(-4)}`,
+        category: categoryName,
         total: categoryTasks.length,
         completed,
         rate: categoryTasks.length > 0 ? Math.round((completed / categoryTasks.length) * 100) : 0
       };
-    });
+    }).sort((a, b) => b.total - a.total);
 
     // Productivity patterns
     const completedTasks = tasks.filter(t => t.completed);
