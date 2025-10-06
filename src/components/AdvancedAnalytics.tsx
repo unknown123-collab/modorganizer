@@ -127,8 +127,19 @@ const AdvancedAnalytics = () => {
 
     // Productivity patterns
     const completedTasks = tasks.filter(t => t.completed);
-    const avgCompletionTime = completedTasks.length > 0 
-      ? completedTasks.reduce((acc, task) => acc + (task.time_estimate || 30), 0) / completedTasks.length 
+    
+    // Calculate average actual tracked time for completed tasks
+    const tasksWithTrackedTime = completedTasks.map(task => {
+      const taskBlocks = timeBlocks.filter(block => block.task_id === task.id);
+      const totalMinutes = taskBlocks.reduce((sum, block) => {
+        const duration = (new Date(block.end_time).getTime() - new Date(block.start_time).getTime()) / (1000 * 60);
+        return sum + Math.max(0, duration);
+      }, 0);
+      return totalMinutes;
+    }).filter(time => time > 0); // Only include tasks with tracked time
+    
+    const avgCompletionTime = tasksWithTrackedTime.length > 0
+      ? Math.round(tasksWithTrackedTime.reduce((sum, time) => sum + time, 0) / tasksWithTrackedTime.length)
       : 0;
 
     const overdueTasks = tasks.filter(t => 
