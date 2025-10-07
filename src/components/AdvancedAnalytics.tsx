@@ -166,15 +166,7 @@ const AdvancedAnalytics = () => {
         completionRate: tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0,
         avgCompletionTime: Math.round(avgCompletionTime),
         overdueTasks,
-        upcomingDeadlines,
-        totalFocusTime: Math.round(timeBlocks.reduce((total, block) => {
-          // Only count completed blocks
-          if (!block.completed) return total;
-          const start = new Date(block.start_time);
-          const end = new Date(block.end_time);
-          const duration = (end.getTime() - start.getTime()) / (1000 * 60);
-          return total + Math.max(0, duration); // Ensure no negative values
-        }, 0) / 60)
+        upcomingDeadlines
       }
     };
   }, [tasks, timeBlocks]);
@@ -185,7 +177,7 @@ const AdvancedAnalytics = () => {
       <RealTimeAnalytics />
       
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -196,18 +188,6 @@ const AdvancedAnalytics = () => {
               <CheckCircle2 className="h-8 w-8 text-green-500" />
             </div>
             <Progress value={analytics.stats.completionRate} className="mt-2" />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Focus Time</p>
-                <p className="text-2xl font-bold">{analytics.stats.totalFocusTime}h</p>
-              </div>
-              <Timer className="h-8 w-8 text-blue-500" />
-            </div>
           </CardContent>
         </Card>
 
