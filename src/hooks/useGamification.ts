@@ -63,21 +63,23 @@ export const useGamification = () => {
       }
     }
 
-    // Calculate time spent
-    const timeSpent = timeBlocks
+    // Calculate time spent (ensure no negative values)
+    const timeSpent = Math.max(0, timeBlocks
       .filter(block => block.completed)
       .reduce((total, block) => {
         const start = new Date(block.start_time);
         const end = new Date(block.end_time);
-        return total + (end.getTime() - start.getTime()) / (1000 * 60);
-      }, 0);
+        const duration = (end.getTime() - start.getTime()) / (1000 * 60);
+        return total + Math.max(0, duration); // Prevent negative durations
+      }, 0));
 
     // Calculate efficiency
-    const efficiency = totalTasks > 0 ? (completedTasks.length / totalTasks) * 100 : 0;
+    const efficiency = totalTasks > 0 ? Math.max(0, Math.min(100, (completedTasks.length / totalTasks) * 100)) : 0;
 
-    // Calculate points and level
-    const points = (completedTasks.length * 10) + (streak * 5) + Math.floor(timeSpent / 60 * 2);
-    const level = Math.floor(points / 100) + 1;
+    // Calculate points and level (ensure positive values)
+    const basePoints = (completedTasks.length * 10) + (Math.max(0, streak) * 5) + Math.floor(timeSpent / 60 * 2);
+    const points = Math.max(0, basePoints);
+    const level = Math.max(1, Math.floor(points / 100) + 1);
 
     setUserStats({
       totalPoints: points,
