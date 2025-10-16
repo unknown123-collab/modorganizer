@@ -220,21 +220,24 @@ const EnhancedCalendar = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header - Mobile Friendly */}
+      <div className="space-y-3 sm:space-y-4">
         <div className="flex items-center gap-2">
-          <Clock className="h-6 w-6 text-primary" />
-          <h1 className="text-3xl font-bold">Calendar</h1>
+          <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Calendar</h1>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 mr-4">
+        
+        {/* Notification Controls - Full Width on Mobile */}
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2">
             {notificationsEnabled ? (
               <Bell className="h-4 w-4 text-primary" />
             ) : (
               <BellOff className="h-4 w-4 text-muted-foreground" />
             )}
             <Switch checked={notificationsEnabled} onCheckedChange={handleNotificationToggle} />
-            <span className="text-sm font-medium">
+            <span className="text-xs sm:text-sm font-medium">
               {notificationsEnabled ? 'Notifications On' : 'Notifications Off'}
             </span>
           </div>
@@ -247,26 +250,37 @@ const EnhancedCalendar = () => {
             disabled={testing}
           >
             <Bell className="h-4 w-4" />
-            {testing ? 'Testing…' : 'Test'}
+            <span className="hidden sm:inline">{testing ? 'Testing…' : 'Test'}</span>
+            <span className="sm:hidden">{testing ? '...' : 'Test'}</span>
           </Button>
+        </div>
 
-          <Button onClick={() => generateSchedule(selectedDate)} className="flex items-center gap-2">
+        {/* Action Buttons - Stack on Mobile */}
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+          <Button 
+            onClick={() => generateSchedule(selectedDate)} 
+            className="flex items-center justify-center gap-2 w-full sm:w-auto"
+          >
             <Sparkles className="h-4 w-4" />
-            Generate Schedule for {format(selectedDate, 'MMM d')}
+            <span className="text-sm">Generate for {format(selectedDate, 'MMM d')}</span>
           </Button>
-          <Button onClick={() => generateSchedule()} variant="outline" className="flex items-center gap-2">
+          <Button 
+            onClick={() => generateSchedule()} 
+            variant="outline" 
+            className="flex items-center justify-center gap-2 w-full sm:w-auto"
+          >
             <Sparkles className="h-4 w-4" />
-            Generate Full Schedule
+            <span className="text-sm">Generate Full Schedule</span>
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Calendar */}
         <Card className="lg:col-span-2 shadow-lg">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center justify-between">
-              <span className="text-xl">{format(viewDate, 'MMMM yyyy')}</span>
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <span className="text-lg sm:text-xl text-foreground">{format(viewDate, 'MMMM yyyy')}</span>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -318,9 +332,9 @@ const EnhancedCalendar = () => {
 
         {/* Selected Date Details */}
         <Card className="shadow-lg">
-          <CardHeader className="pb-4">
+          <CardHeader className="pb-3 sm:pb-4">
             <CardTitle className="flex items-center gap-2">
-              <span className="text-lg">{format(selectedDate, 'EEEE, MMM d')}</span>
+              <span className="text-base sm:text-lg text-foreground">{format(selectedDate, 'EEEE, MMM d')}</span>
               {(tasksForSelectedDate.length > 0 || blocksForSelectedDate.length > 0) && (
                 <Badge variant="secondary" className="ml-auto">
                   {tasksForSelectedDate.length + blocksForSelectedDate.length}
