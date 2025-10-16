@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserSettings } from '@/hooks/useUserSettings';
+import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +19,7 @@ const Settings = () => {
   const { user } = useAuth();
   const { profile, loading: profileLoading, updateProfile } = useProfile();
   const { settings, loading: settingsLoading, updateSettings } = useUserSettings();
+  const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -26,12 +28,6 @@ const Settings = () => {
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [theme, setTheme] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') || 'system';
-    }
-    return 'system';
-  });
 
   // Update form fields when profile loads
   React.useEffect(() => {
@@ -44,28 +40,13 @@ const Settings = () => {
 
   // Update theme from settings
   React.useEffect(() => {
-    if (settings?.theme) {
-      setTheme(settings.theme);
-      applyTheme(settings.theme);
+    if (settings?.theme && settings.theme !== theme) {
+      setTheme(settings.theme as "dark" | "light" | "system");
     }
   }, [settings]);
 
-  const applyTheme = (newTheme: string) => {
-    const root = window.document.documentElement;
-    
-    if (newTheme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      root.classList.toggle('dark', systemTheme === 'dark');
-    } else {
-      root.classList.toggle('dark', newTheme === 'dark');
-    }
-    
-    localStorage.setItem('theme', newTheme);
-  };
-
-  const handleThemeChange = async (newTheme: string) => {
+  const handleThemeChange = async (newTheme: "dark" | "light" | "system") => {
     setTheme(newTheme);
-    applyTheme(newTheme);
     
     // Update theme in user settings
     if (settings) {

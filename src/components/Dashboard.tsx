@@ -14,12 +14,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LayoutGrid, Sparkles, LogOut, User, Trophy, Target } from 'lucide-react';
-import { useTheme } from '@/hooks/useTheme';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const { tasks } = useSupabaseTasks();
-  useTheme();
 
   const completedTasks = tasks.filter(t => t.completed).length;
   const recentAchievements = [];
@@ -153,14 +151,14 @@ const Dashboard = () => {
       {/* Tips Section */}
       <TipsCard />
       
-      {/* Progress Overview */}
-      <div>
-        <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-          <h2 className="text-lg sm:text-xl font-semibold">Tasks Progress</h2>
+        {/* Progress Overview */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground">Tasks Progress</h2>
+          </div>
+          <TasksProgressCard />
         </div>
-        <TasksProgressCard />
-      </div>
     </div>
   );
 };
