@@ -125,15 +125,15 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Notification System - runs in background to show toast notifications */}
+      <NotificationSystem />
       
       {/* Task Input */}
       <EnhancedTaskInput />
       
       {/* Category Management */}
       <CategoryManager />
-
-      {/* Notification System - runs in background to show toast notifications */}
-      <NotificationSystem />
 
       {/* Dashboard Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
