@@ -177,7 +177,14 @@ const EnhancedTaskManagement = () => {
   const completeTask = async (taskId: string) => {
     const task = filteredTasks.find(t => t.id === taskId);
     if (task) {
-      await updateTask(taskId, { completed: !task.completed });
+      if (!task.completed) {
+        // When completing a task, mark as completed and archive it
+        await updateTask(taskId, { completed: true });
+        await archiveTask(taskId);
+      } else {
+        // When uncompleting, just mark as not completed (keep in archive if already archived)
+        await updateTask(taskId, { completed: false });
+      }
     }
   };
 

@@ -16,8 +16,12 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
   const { tasks } = useSupabaseTasks();
   const navigate = useNavigate();
   
-  const completedTasks = tasks.filter(task => task.completed).length;
-  const totalTasks = tasks.length;
+  // Count only non-archived tasks for proper stats
+  const activeTasks = tasks.filter(task => !task.archived);
+  const completedTasks = activeTasks.filter(task => task.completed).length;
+  const remainingTasks = activeTasks.filter(task => !task.completed).length;
+  const totalTasks = activeTasks.length;
+  const archivedTasks = tasks.filter(task => task.archived).length;
   const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
   
   return (
@@ -72,9 +76,9 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
         >
           <CheckSquare className="w-5 h-5 mr-3" />
           <span className="font-medium">Tasks</span>
-          {totalTasks > 0 && (
+          {remainingTasks > 0 && (
             <span className="ml-auto bg-muted text-muted-foreground text-xs px-2 py-1 rounded-full">
-              {totalTasks}
+              {remainingTasks}
             </span>
           )}
         </button>
@@ -107,9 +111,9 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
         >
           <Archive className="w-5 h-5 mr-3" />
           <span className="font-medium">Archive</span>
-          {completedTasks > 0 && (
+          {archivedTasks > 0 && (
             <span className="ml-auto bg-muted text-muted-foreground text-xs px-2 py-1 rounded-full">
-              {completedTasks}
+              {archivedTasks}
             </span>
           )}
         </button>
