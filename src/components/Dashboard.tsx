@@ -31,9 +31,6 @@ const Dashboard = () => {
   
   return (
     <div className="space-y-6">
-      {/* Notification System - runs in background to show toast notifications */}
-      <NotificationSystem />
-      
       {/* Header with Stats */}
       <div className="flex flex-col gap-4 mb-6">
         {/* Top Row: Dashboard Title and Buttons */}
@@ -134,6 +131,9 @@ const Dashboard = () => {
       
       {/* Category Management */}
       <CategoryManager />
+
+      {/* Notification System - runs in background to show toast notifications */}
+      <NotificationSystem />
 
       {/* Dashboard Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
