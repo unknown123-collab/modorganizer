@@ -3,23 +3,20 @@ import React, { useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserSettings } from '@/hooks/useUserSettings';
-import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Save, Moon, Sun, Monitor, ArrowLeft, Loader2 } from 'lucide-react';
+import { Camera, Save, ArrowLeft, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
   const { user } = useAuth();
   const { profile, loading: profileLoading, updateProfile } = useProfile();
-  const { settings, loading: settingsLoading, updateSettings } = useUserSettings();
-  const { theme, setTheme } = useTheme();
+  const { settings, loading: settingsLoading } = useUserSettings();
   const { toast } = useToast();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -37,22 +34,6 @@ const Settings = () => {
       setAvatarUrl(profile.avatar_url || '');
     }
   }, [profile]);
-
-  // Update theme from settings
-  React.useEffect(() => {
-    if (settings?.theme && settings.theme !== theme) {
-      setTheme(settings.theme as "dark" | "light" | "system");
-    }
-  }, [settings]);
-
-  const handleThemeChange = async (newTheme: "dark" | "light" | "system") => {
-    setTheme(newTheme);
-    
-    // Update theme in user settings
-    if (settings) {
-      await updateSettings({ theme: newTheme });
-    }
-  };
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -115,21 +96,10 @@ const Settings = () => {
     }
   };
 
-  const getThemeIcon = () => {
-    switch (theme) {
-      case 'light':
-        return <Sun className="h-4 w-4" />;
-      case 'dark':
-        return <Moon className="h-4 w-4" />;
-      default:
-        return <Monitor className="h-4 w-4" />;
-    }
-  };
-
   // Show loading state
   if (profileLoading || settingsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
           <p className="text-muted-foreground">Loading settings...</p>
@@ -139,9 +109,9 @@ const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       {/* Mobile Header */}
-      <div className="lg:hidden bg-white dark:bg-slate-800 border-b border-border p-4">
+      <div className="lg:hidden bg-white border-b border-border p-4">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')}>
             <ArrowLeft className="h-5 w-5" />
@@ -249,53 +219,6 @@ const Settings = () => {
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? 'Saving...' : 'Save Profile'}
               </Button>
-            </CardContent>
-          </Card>
-
-          {/* Theme Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                Appearance
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="theme">Theme</Label>
-                <Select value={theme} onValueChange={handleThemeChange}>
-                  <SelectTrigger className="w-full sm:w-[200px]">
-                    <SelectValue>
-                      <div className="flex items-center gap-2">
-                        {getThemeIcon()}
-                        <span className="capitalize">{theme}</span>
-                      </div>
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">
-                      <div className="flex items-center gap-2">
-                        <Sun className="h-4 w-4" />
-                        Light
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="dark">
-                      <div className="flex items-center gap-2">
-                        <Moon className="h-4 w-4" />
-                        Dark
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="system">
-                      <div className="flex items-center gap-2">
-                        <Monitor className="h-4 w-4" />
-                        System
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-muted-foreground">
-                  Choose your preferred theme or use system setting
-                </p>
-              </div>
             </CardContent>
           </Card>
         </div>

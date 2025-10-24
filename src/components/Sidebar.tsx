@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { LayoutDashboard, CheckSquare, Calendar, BarChart, Settings, Archive } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import { ThemeToggle } from './ThemeToggle';
 
 interface SidebarProps {
   activeView: 'dashboard' | 'tasks' | 'calendar' | 'analytics' | 'archive' | 'collaboration' | 'integrations' | 'reports' | 'workspaces';
@@ -138,16 +137,15 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
         </div>
       </div>
       
-      {/* Settings & Theme Toggle */}
-      <div className="p-4 border-t border-border flex items-center justify-between">
+      {/* Settings */}
+      <div className="p-4 border-t border-border">
         <button 
           onClick={() => navigate('/settings')}
-          className="flex items-center text-sm px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
+          className="flex items-center w-full text-sm px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
         >
           <Settings className="w-4 h-4 mr-3" />
           <span className="text-foreground">Settings</span>
         </button>
-        <ThemeToggle />
       </div>
     </div>
   );
