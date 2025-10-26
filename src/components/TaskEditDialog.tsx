@@ -25,9 +25,9 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
     title: '',
     description: '',
     priority: 'notUrgent-notImportant' as SupabaseTask['priority'],
-    timeEstimate: '',
     categoryId: '',
-    deadline: undefined as Date | undefined,
+    timeStarts: undefined as Date | undefined,
+    timeEnds: undefined as Date | undefined,
     tags: [] as string[]
   });
 
@@ -37,9 +37,9 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
       title: task.title,
       description: task.description || '',
       priority: task.priority,
-      timeEstimate: task.time_estimate?.toString() || '',
       categoryId: task.category_id || '',
-      deadline: task.deadline ? toPhilippineTime(task.deadline) : undefined,
+      timeStarts: task.time_starts ? new Date(task.time_starts) : undefined,
+      timeEnds: task.time_ends ? new Date(task.time_ends) : undefined,
       tags: task.tags || []
     });
     }
@@ -47,15 +47,25 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!task || !formData.title.trim()) return;
+    if (!task || !formData.title.trim() || !formData.description.trim()) {
+      alert('Title and Description are required');
+      return;
+    }
+    
+    if (formData.timeStarts && formData.timeEnds) {
+      if (formData.timeEnds <= formData.timeStarts) {
+        alert('End time must be later than start time');
+        return;
+      }
+    }
 
     await updateTask(task.id, {
       title: formData.title,
-      description: formData.description || undefined,
+      description: formData.description,
       priority: formData.priority,
-      time_estimate: formData.timeEstimate ? parseInt(formData.timeEstimate) : undefined,
       category_id: formData.categoryId || undefined,
-      deadline: formData.deadline?.toISOString(),
+      time_starts: formData.timeStarts?.toISOString(),
+      time_ends: formData.timeEnds?.toISOString(),
       tags: formData.tags
     });
 
@@ -95,108 +105,91 @@ const TaskEditDialog = ({ task, open, onOpenChange }: TaskEditDialogProps) => {
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="edit-description">Description (Optional)</Label>
+            <Label htmlFor="edit-description">Description *</Label>
             <Textarea
               id="edit-description"
-              placeholder="Add more details about this task..."
+              placeholder="Add details about this task (required)..."
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               rows={3}
+              required
             />
           </div>
 
-          {/* Priority and Time Estimate Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2 text-sm">
-                <Target className="h-4 w-4" />
-                Priority
-              </Label>
-              <Select
-                value={formData.priority}
-                onValueChange={(value: any) => setFormData(prev => ({ ...prev, priority: value }))}
-              >
-                <SelectTrigger className="h-10">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border border-border shadow-lg z-[100]">
-                  {priorityOptions.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <div className="flex items-center gap-2">
-                        <div className={`w-3 h-3 rounded-full ${option.color}`} />
-                        <span className="text-sm">{option.label}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2 text-sm">
-                <Clock className="h-4 w-4" />
-                Time Estimate (minutes)
-              </Label>
-              <Input
-                type="number"
-                placeholder="30"
-                value={formData.timeEstimate}
-                onChange={(e) => setFormData(prev => ({ ...prev, timeEstimate: e.target.value }))}
-                className="h-10"
-              />
-            </div>
+          {/* Priority */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2 text-sm">
+              <Target className="h-4 w-4" />
+              Priority
+            </Label>
+            <Select
+              value={formData.priority}
+              onValueChange={(value: any) => setFormData(prev => ({ ...prev, priority: value }))}
+            >
+              <SelectTrigger className="h-10">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border border-border shadow-lg z-[100]">
+                {priorityOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${option.color}`} />
+                      <span className="text-sm">{option.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Category and Deadline Row */}
+          {/* Category */}
+          <div className="space-y-2">
+            <Label className="text-sm">Category</Label>
+            <Select
+              value={formData.categoryId}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, categoryId: value }))}
+            >
+              <SelectTrigger className="h-10">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border border-border shadow-lg z-[100]">
+                {categories.map(category => (
+                  <SelectItem key={category.id} value={category.id}>
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: category.color }}
+                      />
+                      <span className="text-sm">{category.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Time Starts and Time Ends */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-sm">Category</Label>
-              <Select
-                value={formData.categoryId}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, categoryId: value }))}
-              >
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border border-border shadow-lg z-[100]">
-                  {categories.map(category => (
-                    <SelectItem key={category.id} value={category.id}>
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-3 h-3 rounded-full" 
-                          style={{ backgroundColor: category.color }}
-                        />
-                        <span className="text-sm">{category.name}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label className="text-sm">Time Starts *</Label>
+              <Input
+                type="datetime-local"
+                value={formData.timeStarts ? format(formData.timeStarts, "yyyy-MM-dd'T'HH:mm") : ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, timeStarts: e.target.value ? new Date(e.target.value) : undefined }))}
+                className="h-10"
+                required
+              />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm">Deadline</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal h-10"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    <span className="text-sm">
-                      {formData.deadline ? formatPhilippineTime(formData.deadline, "PPP") : "Pick a date"}
-                    </span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={formData.deadline}
-                    onSelect={(date) => setFormData(prev => ({ ...prev, deadline: date }))}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <Label className="text-sm">Time Ends *</Label>
+              <Input
+                type="datetime-local"
+                value={formData.timeEnds ? format(formData.timeEnds, "yyyy-MM-dd'T'HH:mm") : ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, timeEnds: e.target.value ? new Date(e.target.value) : undefined }))}
+                className="h-10"
+                required
+              />
             </div>
           </div>
 

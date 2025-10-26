@@ -7,7 +7,7 @@ import Sidebar from '@/components/Sidebar';
 import EnhancedTaskPanel from '@/components/EnhancedTaskPanel';
 import EnhancedTaskManagement from '@/components/EnhancedTaskManagement';
 import Analytics from '@/components/Analytics';
-import EnhancedCalendar from '@/components/EnhancedCalendar';
+import CalendarWithRecommendations from '@/components/CalendarWithRecommendations';
 import Archive from '@/pages/Archive';
 import MobileNav from '@/components/MobileNav';
 import CollaborationHub from '@/components/CollaborationHub';
@@ -59,7 +59,7 @@ const Index = () => {
         <div className="p-3 sm:p-4 md:p-5 lg:p-6 max-w-full w-full">
           {activeView === 'dashboard' && <Dashboard />}
           {activeView === 'tasks' && <EnhancedTaskManagement />}
-          {activeView === 'calendar' && <EnhancedCalendar />}
+          {activeView === 'calendar' && <CalendarWithRecommendations />}
           {activeView === 'analytics' && <Analytics />}
           {activeView === 'archive' && <Archive />}
           {activeView === 'collaboration' && <CollaborationHub />}

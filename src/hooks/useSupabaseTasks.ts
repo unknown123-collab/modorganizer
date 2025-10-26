@@ -8,13 +8,15 @@ import { getPhilippineNow, fromPhilippineTime, toPhilippineTime } from '@/utils/
 export interface SupabaseTask {
   id: string;
   title: string;
-  description?: string;
+  description: string;
   deadline?: string;
   completed: boolean;
   archived: boolean;
   priority: 'urgent-important' | 'urgent-notImportant' | 'notUrgent-important' | 'notUrgent-notImportant';
   category_id?: string;
   time_estimate?: number;
+  time_starts?: string;
+  time_ends?: string;
   tags?: string[];
   created_at: string;
   updated_at: string;
@@ -122,13 +124,15 @@ export const useSupabaseTasks = () => {
       const insertData = {
         title: taskData.title || '',
         user_id: user.id,
-        description: taskData.description,
+        description: taskData.description || '',
         deadline: taskData.deadline ? fromPhilippineTime(new Date(taskData.deadline)).toISOString() : null,
         completed: taskData.completed || false,
         archived: false,
         priority: taskData.priority || 'notUrgent-notImportant',
         category_id: taskData.category_id,
         time_estimate: taskData.time_estimate,
+        time_starts: taskData.time_starts,
+        time_ends: taskData.time_ends,
         tags: taskData.tags
       };
 
