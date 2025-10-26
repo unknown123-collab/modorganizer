@@ -139,11 +139,14 @@ export type Database = {
           completed: boolean | null
           created_at: string | null
           deadline: string | null
-          description: string | null
+          description: string
+          hobby: string | null
           id: string
           priority: string | null
           tags: string[] | null
+          time_ends: string | null
           time_estimate: number | null
+          time_starts: string | null
           title: string
           updated_at: string | null
           user_id: string
@@ -155,11 +158,14 @@ export type Database = {
           completed?: boolean | null
           created_at?: string | null
           deadline?: string | null
-          description?: string | null
+          description?: string
+          hobby?: string | null
           id?: string
           priority?: string | null
           tags?: string[] | null
+          time_ends?: string | null
           time_estimate?: number | null
+          time_starts?: string | null
           title: string
           updated_at?: string | null
           user_id: string
@@ -171,11 +177,14 @@ export type Database = {
           completed?: boolean | null
           created_at?: string | null
           deadline?: string | null
-          description?: string | null
+          description?: string
+          hobby?: string | null
           id?: string
           priority?: string | null
           tags?: string[] | null
+          time_ends?: string | null
           time_estimate?: number | null
+          time_starts?: string | null
           title?: string
           updated_at?: string | null
           user_id?: string
