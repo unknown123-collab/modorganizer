@@ -14,6 +14,15 @@ interface Recommendation {
   recommended_task_index: number;
   reasoning: string;
   key_factors: string[];
+  task_ranking: Array<{
+    task_index: number;
+    rank: number;
+    should_reschedule: boolean;
+  }>;
+  rescheduling_suggestions: Array<{
+    task_index: number;
+    suggestion: string;
+  }>;
 }
 
 const TaskRecommendation = ({ overlappingTasks }: TaskRecommendationProps) => {
@@ -46,7 +55,7 @@ const TaskRecommendation = ({ overlappingTasks }: TaskRecommendationProps) => {
     }
   };
 
-  if (overlappingTasks.length <= 1) return null;
+  if (overlappingTasks.length < 2) return null;
 
   if (loading) {
     return (
@@ -78,12 +87,12 @@ const TaskRecommendation = ({ overlappingTasks }: TaskRecommendationProps) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-yellow-900">
           <Lightbulb className="h-5 w-5" />
-          System Recommendation
+          AI Priority Recommendation ({overlappingTasks.length} Conflicting Tasks)
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <div className="font-medium text-yellow-900 mb-2">Recommended Task:</div>
+          <div className="font-medium text-yellow-900 mb-2">Priority Task:</div>
           <Badge className="bg-yellow-600 text-white text-sm px-3 py-1">
             {recommendedTask.title}
           </Badge>
@@ -102,6 +111,49 @@ const TaskRecommendation = ({ overlappingTasks }: TaskRecommendationProps) => {
             ))}
           </ul>
         </div>
+
+        {recommendation.task_ranking && recommendation.task_ranking.length > 0 && (
+          <div>
+            <div className="font-medium text-yellow-900 mb-2">Task Ranking:</div>
+            <div className="space-y-2">
+              {recommendation.task_ranking
+                .sort((a, b) => a.rank - b.rank)
+                .map((ranking) => {
+                  const task = overlappingTasks[ranking.task_index];
+                  return (
+                    <div key={ranking.task_index} className="flex items-center justify-between text-sm bg-white/50 p-2 rounded">
+                      <span className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">#{ranking.rank}</Badge>
+                        <span className={ranking.should_reschedule ? 'text-yellow-700' : 'text-yellow-900 font-medium'}>
+                          {task?.title}
+                        </span>
+                      </span>
+                      {ranking.should_reschedule && (
+                        <Badge variant="secondary" className="text-xs">Reschedule</Badge>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+
+        {recommendation.rescheduling_suggestions && recommendation.rescheduling_suggestions.length > 0 && (
+          <div>
+            <div className="font-medium text-yellow-900 mb-2">Rescheduling Suggestions:</div>
+            <div className="space-y-2">
+              {recommendation.rescheduling_suggestions.map((suggestion) => {
+                const task = overlappingTasks[suggestion.task_index];
+                return (
+                  <div key={suggestion.task_index} className="text-sm bg-white/50 p-3 rounded border border-yellow-200">
+                    <div className="font-medium text-yellow-900 mb-1">{task?.title}</div>
+                    <p className="text-yellow-800">{suggestion.suggestion}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

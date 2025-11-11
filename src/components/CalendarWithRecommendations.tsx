@@ -26,9 +26,11 @@ const CalendarWithRecommendations = () => {
     });
   }, [tasks, selectedDate]);
 
-  // Find overlapping tasks
+  // Find overlapping tasks and group them together
   const overlappingTasks = useMemo(() => {
-    const overlaps = [];
+    // Create a map to track which tasks overlap with which
+    const overlapMap = new Map<string, Set<string>>();
+    
     for (let i = 0; i < tasksForSelectedDate.length; i++) {
       for (let j = i + 1; j < tasksForSelectedDate.length; j++) {
         const task1 = tasksForSelectedDate[i];
@@ -43,13 +45,55 @@ const CalendarWithRecommendations = () => {
         
         // Check if tasks overlap (any time overlap)
         if (start1 < end2 && start2 < end1) {
-          if (!overlaps.find(group => group.includes(task1) || group.includes(task2))) {
-            overlaps.push([task1, task2]);
+          // Add to overlap map
+          if (!overlapMap.has(task1.id)) {
+            overlapMap.set(task1.id, new Set([task1.id]));
           }
+          if (!overlapMap.has(task2.id)) {
+            overlapMap.set(task2.id, new Set([task2.id]));
+          }
+          overlapMap.get(task1.id)!.add(task2.id);
+          overlapMap.get(task2.id)!.add(task1.id);
         }
       }
     }
-    return overlaps;
+    
+    // Group overlapping tasks into clusters
+    const visited = new Set<string>();
+    const clusters: typeof tasksForSelectedDate[] = [];
+    
+    for (const taskId of overlapMap.keys()) {
+      if (visited.has(taskId)) continue;
+      
+      // BFS to find all connected tasks
+      const cluster = new Set<string>();
+      const queue = [taskId];
+      
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        if (visited.has(current)) continue;
+        
+        visited.add(current);
+        cluster.add(current);
+        
+        const neighbors = overlapMap.get(current);
+        if (neighbors) {
+          for (const neighbor of neighbors) {
+            if (!visited.has(neighbor)) {
+              queue.push(neighbor);
+            }
+          }
+        }
+      }
+      
+      // Convert task IDs to actual tasks
+      const clusterTasks = tasksForSelectedDate.filter(t => cluster.has(t.id));
+      if (clusterTasks.length > 1) {
+        clusters.push(clusterTasks);
+      }
+    }
+    
+    return clusters;
   }, [tasksForSelectedDate]);
 
   const getPriorityColor = (priority: string) => {

@@ -19,27 +19,35 @@ serve(async (req) => {
     }
 
     // Build prompt for AI to analyze overlapping tasks
-    const systemPrompt = `You are an expert task prioritization assistant. Analyze overlapping tasks and recommend which should be prioritized based on their descriptions, categories, and urgency. Consider:
-1. Business impact and deadlines
-2. Dependencies mentioned in descriptions
-3. Client-facing vs internal tasks
-4. Urgency indicators in the description
-5. Task categories and their relative importance
+    const systemPrompt = `You are an expert task prioritization assistant. Analyze overlapping or conflicting tasks and provide comprehensive recommendations for ${tasks.length} tasks.
 
-Provide clear, actionable reasoning for your recommendation.`;
+Consider these critical factors:
+1. **Urgency**: Fixed deadlines, time-sensitive events (defenses, presentations, meetings)
+2. **Impact**: Academic, professional, career outcomes, project criticality
+3. **Flexibility**: Which tasks can be rescheduled without major consequences
+4. **Priority Level**: urgent-important > urgent-notImportant > notUrgent-important > notUrgent-notImportant
+5. **Dependencies**: Tasks that block other work
+6. **Duration**: Task length and complexity
 
-    const userPrompt = `Analyze these overlapping tasks and recommend which should be prioritized:
+Provide a clear prioritization ranking and specific rescheduling options for lower-priority tasks.`;
+
+    const userPrompt = `${tasks.length} tasks are overlapping in the same time slot. Analyze all tasks and provide a complete prioritization:
 
 ${tasks.map((t: any, idx: number) => `
 Task ${idx + 1}:
 - Title: ${t.title}
 - Description: ${t.description || 'No description'}
 - Category: ${t.category || 'No category'}
-- Priority: ${t.priority}
-- Time: ${t.time_starts} to ${t.time_ends}
+- Priority Level: ${t.priority}
+- Scheduled Time: ${new Date(t.time_starts).toLocaleString()} to ${new Date(t.time_ends).toLocaleString()}
+- Duration: ${Math.round((new Date(t.time_ends).getTime() - new Date(t.time_starts).getTime()) / 60000)} minutes
 `).join('\n')}
 
-Return your analysis with the recommended task and reasoning.`;
+Provide:
+1. The recommended task to execute first (highest priority)
+2. Clear ranking of all tasks by priority
+3. Specific rescheduling suggestions for tasks that should be moved
+4. Detailed reasoning considering urgency, impact, and flexibility`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -58,25 +66,48 @@ Return your analysis with the recommended task and reasoning.`;
             type: "function",
             function: {
               name: "prioritize_tasks",
-              description: "Return task prioritization recommendation with reasoning",
+              description: "Return comprehensive task prioritization with ranking and rescheduling options",
               parameters: {
                 type: "object",
                 properties: {
                   recommended_task_index: {
                     type: "number",
-                    description: "Index of the recommended task (0-based)"
+                    description: "Index of the highest priority task to execute first (0-based)"
                   },
                   reasoning: {
                     type: "string",
-                    description: "Clear explanation for why this task should be prioritized"
+                    description: "Detailed explanation considering urgency, impact, flexibility, and deadlines"
                   },
                   key_factors: {
                     type: "array",
                     items: { type: "string" },
-                    description: "Key factors that influenced the decision"
+                    description: "Key factors that influenced the decision (urgency, impact, flexibility, etc.)"
+                  },
+                  task_ranking: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        task_index: { type: "number" },
+                        rank: { type: "number" },
+                        should_reschedule: { type: "boolean" }
+                      }
+                    },
+                    description: "Complete ranking of all tasks with rescheduling flags"
+                  },
+                  rescheduling_suggestions: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        task_index: { type: "number" },
+                        suggestion: { type: "string" }
+                      }
+                    },
+                    description: "Specific rescheduling suggestions for tasks that should be moved"
                   }
                 },
-                required: ["recommended_task_index", "reasoning", "key_factors"],
+                required: ["recommended_task_index", "reasoning", "key_factors", "task_ranking", "rescheduling_suggestions"],
                 additionalProperties: false
               }
             }
