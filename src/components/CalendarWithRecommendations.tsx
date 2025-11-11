@@ -41,13 +41,10 @@ const CalendarWithRecommendations = () => {
         const start2 = new Date(task2.time_starts);
         const end2 = new Date(task2.time_ends);
         
-        // Check if tasks overlap
+        // Check if tasks overlap (any time overlap)
         if (start1 < end2 && start2 < end1) {
-          // Check if same title
-          if (task1.title === task2.title) {
-            if (!overlaps.find(group => group.includes(task1) || group.includes(task2))) {
-              overlaps.push([task1, task2]);
-            }
+          if (!overlaps.find(group => group.includes(task1) || group.includes(task2))) {
+            overlaps.push([task1, task2]);
           }
         }
       }
